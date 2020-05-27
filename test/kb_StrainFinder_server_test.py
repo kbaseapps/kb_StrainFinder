@@ -2,6 +2,8 @@
 import os
 import time
 import unittest
+import shutil
+from pprint import pprint
 try:
     from ConfigParser import ConfigParser  # py2
 except:
@@ -12,6 +14,8 @@ from kb_StrainFinder.kb_StrainFinderServer import MethodContext
 from kb_StrainFinder.authclient import KBaseAuth as _KBaseAuth
 
 from installed_clients.WorkspaceClient import Workspace
+from installed_clients.GenomeFileUtilClient import GenomeFileUtil
+from installed_clients.ReadsUtilsClient import ReadsUtils
 
 
 class kb_StrainFinderTest(unittest.TestCase):
@@ -54,17 +58,96 @@ class kb_StrainFinderTest(unittest.TestCase):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        if hasattr(cls, 'shock_ids'):
+            for shock_id in cls.shock_ids:
+                print('Deleting SHOCK node: '+str(shock_id))
+                cls.delete_shock_node(shock_id)
 
-    # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_your_method(self):
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
-        ret = self.serviceImpl.run_kb_StrainFinder(self.ctx, {'workspace_name': self.wsName,
-                                                             'parameter_1': 'Hello World!'})
+    @classmethod
+    def delete_shock_node(cls, node_id):
+        header = {'Authorization': 'Oauth {0}'.format(cls.token)}
+        requests.delete(cls.shockURL + '/node/' + node_id, headers=header,
+                        allow_redirects=True)
+        print('Deleted shock node ' + node_id)
+
+    def getWsClient(self):
+        return self.__class__.wsClient
+
+    def getWsName(self):
+        if hasattr(self.__class__, 'wsName'):
+            return self.__class__.wsName
+        suffix = int(time.time() * 1000)
+        wsName = "test_kb_ReadsUtilities_" + str(suffix)
+        ret = self.getWsClient().create_workspace({'workspace': wsName})
+        self.__class__.wsName = wsName
+        return wsName
+
+    def getImpl(self):
+        return self.__class__.serviceImpl
+
+    def getContext(self):
+        return self.__class__.ctx
+
+
+    # test_run_StrainFinder_v1_01
+    # HIDE @unittest.skip("skipped test_run_StrainFinder_v1_01()")  # uncomment to skip
+
+    def test_run_StrainFinder_v1_01(self):
+        method = 'test_run_StrainFinder_v1_01'
+        
+        print ("\n\nRUNNING "+method+"()")
+        print ("===========================================\n\n")
+
+        # connect to clients
+        try:
+            gfuClient = GenomeFileUtil(self.callback_url, token=self.getContext()['token'])
+        except Exception as e:
+            raise ValueError('Unable to instantiate gfuClient with callbackURL: '+ self.callback_url +' ERROR: ' + str(e))
+        try:
+            ruClient = ReadsUtils(self.callback_url, token=self.getContext()['token'])
+        except Exception as e:
+            raise ValueError('Unable to instantiate ruClient with callbackURL: '+ self.callback_url +' ERROR: ' + str(e))
+
+        # upload data
+        sci_name = 'Thermodesulfobacterium thermophilum DSM 1276',
+        base_genome = 'GCF_000421605.1_ASM42160v1_genomic'
+        base_reads = 'seven_species_nonuniform_10K.PE_reads_paired-0'
+        genome_gff_file = base_genome+'.gff.gz'
+        genome_fna_file = base_genome+'.fna.gz'
+        reads_file =  base_reads+'.fq'
+        genome_gff_path = os.path.join(self.scratch, genome_gff_file)
+        genome_fna_path = os.path.join(self.scratch, genome_fna_file)
+        reads_path = os.path.join(self.scratch, reads_file)
+        shutil.copy(os.path.join("data", genome_gff_file), genome_gff_path)
+        shutil.copy(os.path.join("data", genome_fna_file), genome_fna_path)
+        shutil.copy(os.path.join("data", reads_file), reads_path)
+        genome_ref = gfuClient.fasta_gff_to_genome({
+            'workspace_name': self.getWsName(),
+            'fasta_file': {'path': genome_fna_path},
+            'gff_file': {'path': genome_gff_path},
+            'generate_missing_genes': 1,
+            'source': 'GFF',
+            #'scientific_name': sci_name,  # this is causing an error for some reason
+            'genome_name': base_genome+'.Genome'
+        }).get('genome_ref')
+
+        reads_ref = ruClient.upload_reads({
+            'wsname': self.getWsName(),
+            'fwd_file': reads_path,
+            'sequencing_tech': 'artificial reads',
+            'interleaved': 1,
+            'name': base_reads+'.Reads'
+        })['obj_ref']
+        
+        # run method
+        output_name = method+'_output'
+        params = {
+            'workspace_name': self.getWsName(),
+            'in_genome_ref': genome_ref,
+            'in_readsLib_ref': reads_ref,
+            'out_obj_name': output_name
+        }
+        result = self.getImpl().run_StrainFinder_v1(self.getContext(),params)
+        print('RESULT:')
+        pprint(result)
+        pass

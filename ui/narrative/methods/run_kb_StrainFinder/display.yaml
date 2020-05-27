@@ -29,20 +29,20 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-    in_assembly_refs :
-        ui-name    : Reference genomes
-        short-hint : May be Assembly, AssemblySet, Genome, or GenomeSet object
+    in_genome_ref :
+        ui-name    : Reference genome
+        short-hint : Genome to align reads to (single genome only at this time)
 
     in_readslib_ref :
         ui-name    : Reads library
         short-hint : Input reads library (single library only at this time)
 
     out_obj_name :
-        ui-name    : Output name
-        short-hint : Output type Assembly -> AssemblySet, Genome -> GenomeSet.
+        ui-name    : Output GenomeSet
+        short-hint : Output GenomeSet.
 
 description : |
-    <p>StrainFinder v1: Find co-varying haplotype modes to determine how many strains are extant in sample</p>
+    <p>StrainFinder v1: Find co-varying haplotype modes to determine how many strains are extant in sample.  Produces a GenomeSet with the Strain Genomes, one Genome object per haplotype linkage.</p>
 
 
 publications: 

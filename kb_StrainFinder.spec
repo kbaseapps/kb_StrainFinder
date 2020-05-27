@@ -10,7 +10,7 @@ module kb_StrainFinder {
 
     typedef structure {
 	string workspace_name;
-        string in_assembly_refs;
+        string in_genome_ref;
         /*string in_vcf_refs;*/  /* not ready yet */
         string in_readslib_ref;
 	string out_obj_name;

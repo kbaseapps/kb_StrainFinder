@@ -11,7 +11,7 @@
     },
     "parameters": [
         {
-            "id": "in_assembly_refs",
+            "id": "in_genome_ref",
             "optional": false,
             "advanced": false,
             "allow_multiple": true,
@@ -19,7 +19,7 @@
             "field_type": "text",
             "text_options": {
                 "valid_ws_types": [
-                    "KBaseGenomeAnnotations.Assembly", "KBaseSets.AssemblySet", "KBaseGenomes.Genome", "KBaseSearch.GenomeSet"
+                    "KBaseGenomes.Genome"
                 ]
             }
         },
@@ -67,9 +67,9 @@
 		    "target_argument_position": 0
                 },
                 {
-                    "input_parameter": "in_assembly_refs",
-                    "target_property": "in_assembly_refs",
-                    "target_type_transform": "list<resolved-ref>",
+                    "input_parameter": "in_genome_ref",
+                    "target_property": "in_genome_ref",
+                    "target_type_transform": "resolved-ref",
 		    "target_argument_position": 0
                 },
                 {
