@@ -9,13 +9,16 @@ module kb_StrainFinder {
     } ReportResults;
 
     typedef structure {
-        string input_genome_refs;
-        string input_vcf_refs;
-    } StrainFinder_1_InputType;
+	string workspace_name;
+        string in_assembly_refs;
+        /*string in_vcf_refs;*/  /* not ready yet */
+        string in_readslib_ref;
+	string out_obj_name;
+    } StrainFinder_v1_InputType;
 
     /*
         This example function accepts any number of parameters and returns results in a KBaseReport
     */
-    funcdef run_StrainFinder_1(StrainFinder_1_InputType params) returns (ReportResults output) authentication required;
+    funcdef run_StrainFinder_v1(StrainFinder_v1_InputType params) returns (ReportResults output) authentication required;
 
 };

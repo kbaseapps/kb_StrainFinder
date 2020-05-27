@@ -1,24 +1,57 @@
 {
     "ver": "0.0.1",
     "authors": [
-        "dylan"
+        "dylan", "jmc", "caozhichongchong"
     ],
     "contact": "",
-    "categories": ["active"],
+    "categories": ["active", "comparative_genomics"],
     "widgets": {
         "input": null,
-        "output": null
+        "output": "no-display"
     },
-    "parameters": [ 
+    "parameters": [
         {
-            "id": "parameter_1",
-            "optional": true,
+            "id": "in_assembly_refs",
+            "optional": false,
             "advanced": false,
-            "allow_multiple": false,
+            "allow_multiple": true,
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ ]
+                "valid_ws_types": [
+                    "KBaseGenomeAnnotations.Assembly", "KBaseSets.AssemblySet", "KBaseGenomes.Genome", "KBaseSearch.GenomeSet"
+                ]
+            }
+        },
+        {
+            "id": "in_readslib_ref",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": null,
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [
+                    "KBaseFile.PairedEndLibrary",
+                    "KBaseFile.SingleEndLibrary",
+                    "KBaseAssembly.PairedEndLibrary",
+                    "KBaseAssembly.SingleEndLibrary"
+                ]
+            }
+        },
+        {
+            "id": "out_obj_name",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": null,
+            "field_type": "text",
+            "text_options": {
+                "is_output_name": true,
+                "valid_ws_types": [
+                    "KBaseSearch.GenomeSet",
+                    "KBaseSets.AssemblySet"
+                ]
             }
         }
     ],
@@ -26,25 +59,38 @@
         "service-mapping": {
             "url": "",
             "name": "kb_StrainFinder",
-            "method": "run_kb_StrainFinder",
+            "method": "run_StrainFinder_v1",
             "input_mapping": [
                 {
                     "narrative_system_variable": "workspace",
-                    "target_property": "workspace_name"
-                },{
-                    "narrative_system_variable": "workspace_id",
-                    "target_property": "workspace_id"
-                },{
-                    "input_parameter": "parameter_1",
-                    "target_property": "parameter_1"
+                    "target_property": "workspace_name",
+		    "target_argument_position": 0
+                },
+                {
+                    "input_parameter": "in_assembly_refs",
+                    "target_property": "in_assembly_refs",
+                    "target_type_transform": "list<resolved-ref>",
+		    "target_argument_position": 0
+                },
+                {
+                    "input_parameter": "in_readslib_ref",
+                    "target_property": "in_readslib_ref",
+                    "target_type_transform": "resolved-ref",
+		    "target_argument_position": 0
+                },
+                {
+                    "input_parameter": "out_obj_name",
+                    "target_property": "out_obj_name",
+		    "target_argument_position": 0
                 }
             ],
             "output_mapping": [
                 {
-                    "service_method_output_path": [0,"report_name"],
+                    "service_method_output_path": [0, "report_name"],
                     "target_property": "report_name"
-                },{
-                    "service_method_output_path": [0,"report_ref"],
+                },
+                {
+                    "service_method_output_path": [0, "report_ref"],
                     "target_property": "report_ref"
                 }
             ]

@@ -45,9 +45,8 @@ class kb_StrainFinder:
         """
         This example function accepts any number of parameters and returns results in a KBaseReport
         :param params: instance of type "StrainFinder_v1_InputType" ->
-           structure: parameter "workspace_name" of String, parameter
-           "in_assembly_refs" of String, parameter "in_readslib_ref" of
-           String, parameter "out_obj_name" of String
+           structure: parameter "in_assembly_refs" of String, parameter
+           "in_readslib_ref" of String, parameter "out_obj_name" of String
         :returns: instance of type "ReportResults" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String
         """
