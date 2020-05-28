@@ -144,10 +144,11 @@ class kb_StrainFinderTest(unittest.TestCase):
         params = {
             'workspace_name': self.getWsName(),
             'in_genome_ref': genome_ref,
-            'in_readsLib_ref': reads_ref,
+            'in_readslib_ref': reads_ref,
             'out_obj_name': output_name
         }
         result = self.getImpl().run_StrainFinder_v1(self.getContext(),params)
-        print('RESULT:')
+
+        print("\nRESULT:")
         pprint(result)
         pass
