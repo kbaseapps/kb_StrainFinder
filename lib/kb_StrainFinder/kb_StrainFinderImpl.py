@@ -45,6 +45,10 @@ class kb_StrainFinder:
 
     #BEGIN_CLASS_HEADER
 
+    # binaries
+    STRAINFINDER_v1_bin = "/kb/module/strainfinder/strainFinder.py"
+    VCFTOOLS_bin        = "/usr/local/bin/vcftools"
+    
     # timestamp
     def now_ISO(self):
         now_timestamp = datetime.now()

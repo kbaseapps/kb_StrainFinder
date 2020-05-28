@@ -8,7 +8,7 @@ tooltip: |
 
 screenshots: []
 
-icon: StrainFinder-purple.png
+icon: strainfinder-green.png
 
 #
 # define a set of similar methods that might be useful to the user
@@ -51,3 +51,18 @@ publications:
               StrainFinder v1 BitBucket Repo
         link: |
               https://bitbucket.org/yonatanf/strainfinder
+    -
+        display-text: |
+              meta_decoder Github Repo
+        link: |
+              https://github.com/kbaseapps/kb_meta_decoder
+    -
+        display-text: |
+              vcftools Github Page
+        link: |
+              https://vcftools.github.io/
+    -
+        display-text: |
+              "The Variant Call Format and VCFtools" Petr Danecek, Adam Auton, Goncalo Abecasis, Cornelis A. Albers, Eric Banks, Mark A. DePristo, Robert Handsaker, Gerton Lunter, Gabor Marth, Stephen T. Sherry, Gilean McVean, Richard Durbin and 1000 Genomes Project Analysis Group, Bioinformatics, 2011 
+        link: |
+              http://dx.doi.org/10.1093/bioinformatics/btr330

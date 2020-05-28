@@ -17,7 +17,6 @@ RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
 
 WORKDIR /kb/module
-
 RUN make all
 
 RUN git clone https://bitbucket.org/yonatanf/strainfinder
@@ -27,6 +26,14 @@ ENV PATH $PATH:/kb/module/strainfinder
 
 WORKDIR /kb/module
 
+RUN git clone https://github.com/vcftools/vcftools.git
+WORKDIR /kb/module/vcftools
+RUN ./autogen.sh
+RUN ./configure
+RUN make
+RUN make install
+
+WORKDIR /kb/module
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 
 CMD [ ]
