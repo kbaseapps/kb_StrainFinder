@@ -338,10 +338,10 @@ class Application(object):
         self.serverlog.set_log_level(6)
         self.rpc_service = JSONRPCServiceCustom()
         self.method_authentication = dict()
-        self.rpc_service.add(impl_kb_StrainFinder.run_StrainFinder_1,
-                             name='kb_StrainFinder.run_StrainFinder_1',
+        self.rpc_service.add(impl_kb_StrainFinder.run_StrainFinder_v1,
+                             name='kb_StrainFinder.run_StrainFinder_v1',
                              types=[dict])
-        self.method_authentication['kb_StrainFinder.run_StrainFinder_1'] = 'required'  # noqa
+        self.method_authentication['kb_StrainFinder.run_StrainFinder_v1'] = 'required'  # noqa
         self.rpc_service.add(impl_kb_StrainFinder.status,
                              name='kb_StrainFinder.status',
                              types=[dict])

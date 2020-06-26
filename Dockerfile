@@ -6,7 +6,7 @@ MAINTAINER KBase Developer
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
 
-# RUN apt-get update
+RUN apt-get update
 RUN pip install openopt numpy scipy FuncDesigner DerApproximator Cython
 
 
@@ -17,7 +17,6 @@ RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
 
 WORKDIR /kb/module
-
 RUN make all
 
 RUN git clone https://bitbucket.org/yonatanf/strainfinder
@@ -27,6 +26,15 @@ ENV PATH $PATH:/kb/module/strainfinder
 
 WORKDIR /kb/module
 
+# vcftools run by meta_decoder subcall
+#RUN git clone https://github.com/vcftools/vcftools.git
+#WORKDIR /kb/module/vcftools
+#RUN ./autogen.sh
+#RUN ./configure
+#RUN make
+#RUN make install
+
+WORKDIR /kb/module
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 
 CMD [ ]
