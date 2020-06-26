@@ -575,7 +575,7 @@ str(input_reads_ref) +')' + str(e))
                         if pos_n >= beg and pos_n <= end:
                             gene_has_SNP = True
                             break
-                    if gene_has_SNP:
+                    if gene_has_SNP and locus_type == 'gene':
                         report_text += gff_line+"\n"
                     
             new_gff_files = []
@@ -641,10 +641,10 @@ str(input_reads_ref) +')' + str(e))
                                       str(new_obj_info[OBJID_I]),
                                       str(new_obj_info[VERSION_I])])
             
-            objects_created.extend({'ref': genomeSet_ref,
+            objects_created.append({'ref': genomeSet_ref,
                                     'description': 'StrainFinder GenomeSet'})
             for genome_i in range(num_genomes_found):
-                objects_created.extend({'ref': new_genome_refs[genome_i],
+                objects_created.append({'ref': new_genome_refs[genome_i],
                                         'description': new_genome_names[genome_i]+' StrainFinder Genome'})
 
                 
@@ -677,7 +677,7 @@ str(input_reads_ref) +')' + str(e))
         #
 
         # attach created objects and files to final report
-        objects_created.extend(metadecoder_call_variants_reportObj['objects_created'])
+        #objects_created.append(metadecoder_call_variants_reportObj['objects_created'])
         for file_link_item in metadecoder_call_variants_reportObj['file_links']:
             #this_shock_id = file_link_item['URL']
             this_shock_id = re.sub('^.*/', '', file_link_item['URL'])
@@ -702,7 +702,7 @@ str(input_reads_ref) +')' + str(e))
         reportObj['file_links'] = file_links
         reportObj['objects_created'] = objects_created
         if report_text:
-            reportObj['text_message'] = report_text
+            reportObj['message'] = report_text
             
 
         # save report object
