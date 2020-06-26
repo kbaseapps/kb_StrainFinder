@@ -26,12 +26,13 @@ ENV PATH $PATH:/kb/module/strainfinder
 
 WORKDIR /kb/module
 
-RUN git clone https://github.com/vcftools/vcftools.git
-WORKDIR /kb/module/vcftools
-RUN ./autogen.sh
-RUN ./configure
-RUN make
-RUN make install
+# vcftools run by meta_decoder subcall
+#RUN git clone https://github.com/vcftools/vcftools.git
+#WORKDIR /kb/module/vcftools
+#RUN ./autogen.sh
+#RUN ./configure
+#RUN make
+#RUN make install
 
 WORKDIR /kb/module
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]

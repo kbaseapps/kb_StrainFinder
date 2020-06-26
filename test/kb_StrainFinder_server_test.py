@@ -145,7 +145,9 @@ class kb_StrainFinderTest(unittest.TestCase):
             'workspace_name': self.getWsName(),
             'in_genome_ref': genome_ref,
             'in_readslib_ref': reads_ref,
-            'out_obj_name': output_name
+            'out_genomeSet_obj_name': output_name,
+            'min_mapping_quality': 30,
+            'min_depth': 50
         }
         result = self.getImpl().run_StrainFinder_v1(self.getContext(),params)
 

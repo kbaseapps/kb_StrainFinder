@@ -37,7 +37,15 @@ parameters :
         ui-name    : Reads library
         short-hint : Input reads library (single library only at this time)
 
-    out_obj_name :
+    min_mapping_quality :
+        ui-name    : Minimum mapping quality
+        short-hint : Minimum mapping quality for an alignment to be used in mpileup (-q option)
+
+    min_depth :
+        ui-name    : Minimum depth
+        short-hint : Minimum coverage depth for calling variants (for low quality SNPs)
+
+    out_genomeSet_obj_name :
         ui-name    : Output GenomeSet
         short-hint : Output GenomeSet.
 

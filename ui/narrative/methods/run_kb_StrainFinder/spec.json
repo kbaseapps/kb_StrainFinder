@@ -40,7 +40,29 @@
             }
         },
         {
-            "id": "out_obj_name",
+            "id": "min_mapping_quality",
+            "optional": false,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "30" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "int"
+	    }
+        },
+        {
+            "id": "min_depth",
+            "optional": false,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "50" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "int"
+	    }
+        },
+	{
+            "id": "out_genomeSet_obj_name",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
@@ -79,8 +101,18 @@
 		    "target_argument_position": 0
                 },
                 {
-                    "input_parameter": "out_obj_name",
-                    "target_property": "out_obj_name",
+                    "input_parameter": "min_mapping_quality",
+                    "target_property": "min_mapping_quality",
+		    "target_argument_position": 0
+                },
+                {
+                    "input_parameter": "min_depth",
+                    "target_property": "min_depth",
+		    "target_argument_position": 0
+                },
+                {
+                    "input_parameter": "out_genomeSet_obj_name",
+                    "target_property": "out_genomeSet_obj_name",
 		    "target_argument_position": 0
                 }
             ],
