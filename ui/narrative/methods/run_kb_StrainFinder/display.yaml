@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: Run StrainFinder v1
+name: Find Strain Genomes with StrainFinder v1
 
 tooltip: |
     Runs the StrainFinder v1 method to obtain haplotype modes

@@ -154,7 +154,7 @@ class kb_StrainFinder:
         html_links = []
         file_links = []
         objects_created = []
-        self.log(console, 'Running KButil_Split_Reads() with parameters: ')
+        self.log(console, 'Running run_StrainFinder_v1() with parameters: ')
         self.log(console, "\n"+pformat(params))
         
         token = ctx['token']
