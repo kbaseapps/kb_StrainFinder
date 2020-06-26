@@ -148,6 +148,7 @@ class kb_StrainFinder:
 
         #### STEP 0: Init
         ##
+        DEBUG_MODE = 0
         method = 'run_StrainFinder_v1'
         console = []
         report_text = ''
@@ -275,15 +276,22 @@ str(input_reads_ref) +')' + str(e))
         self.log(console, "GETTING GENOME ASSEMBLY OBJECT")
         try:
             genome_object_ret = wsClient.get_objects2({'objects':[{'ref':params['in_genome_ref']}]})['data'][0]
-            genome_object = genome_object_ret['data']
-            genome_obj_info = genome_object_ret['info']
-            input_genome_obj_name = genome_obj_info[NAME_I]
         except Exception as e:
             raise ValueError ("unable to get genome object "+params['in_genome_ref']+". "+str(e))
+        genome_object = genome_object_ret['data']
+        genome_obj_info = genome_object_ret['info']
+        input_genome_obj_name = genome_obj_info[NAME_I]
         
         if not genome_object.get('assembly_ref'):
             raise ValueError ('OLD Genome type cannot be used with method.  Please update your Genome '+params['in_genome_ref']+' to modern Geomee object format')
         assembly_ref = genome_object['assembly_ref']
+        try:
+            input_genome_fasta_file = auClient.get_assembly_as_fasta({'ref':assembly_ref})['path']
+        except Exception as e:
+            raise ValueError ("unable to get genome fasta "+params['in_genome_ref']+". "+str(e))
+        # DEBUG
+        if DEBUG_MODE == 1:
+            input_genome_fasta_file = "/kb/module/dev_test/data/Bin.002.Genome.assembly.fa"
 
         
         #### STEP 4: Do Read mapping and get VCF variant info
@@ -365,7 +373,8 @@ str(input_reads_ref) +')' + str(e))
         self.log(console, "Parsing VCF to polymorphism frequencies")
         vcf_buf = []
         SNP_freqs = dict()
-        #vcf_file = "/kb/module/dev_test/data/Bin.002-37A_testACGT_ploidy1_alternate_2.vcf"  # DEBUG
+        if DEBUG_MODE == 1:
+            vcf_file = "/kb/module/dev_test/data/Bin.002-37A_testACGT_ploidy1_alternate_2.vcf"  # DEBUG
 
         with open (vcf_file, 'r') as vcf_handle:
             vcf_buf = vcf_handle.readlines()
@@ -505,13 +514,6 @@ str(input_reads_ref) +')' + str(e))
 
             #### STEP 9: Create Assembly FASTAs
             ##
-            try:
-                input_genome_fasta_file = auClient.get_assembly_as_fasta({'ref':assembly_ref})['path']
-            except:
-                raise ValueError ("unable to get genome fasta "+params['in_genome_ref']+". "+str(e))
-            # DEBUG
-            #input_genome_fasta_file = "/kb/module/dev_test/data/Bin.002.Genome.assembly.fa"
-
             fasta_read = self.read_fasta_file(input_genome_fasta_file)
             base_genome_fasta = fasta_read['fasta']
             base_genome_headers = fasta_read['headers']
@@ -561,7 +563,8 @@ str(input_reads_ref) +')' + str(e))
             except:
                 raise ValueError ("unable to get genome gff "+params['in_genome_ref']+". "+str(e))
             # DEBUG
-            #input_genome_gff_file = "/kb/module/dev_test/data/Bin.002.fasta_assembly.RAST.gff" 
+            if DEBUG_MODE == 1:
+                input_genome_gff_file = "/kb/module/dev_test/data/Bin.002.fasta_assembly.RAST.gff" 
             with open (input_genome_gff_file, 'r') as gff_handle:
                 for gff_line in gff_handle.readlines():
                     gff_line = gff_line.rstrip()
