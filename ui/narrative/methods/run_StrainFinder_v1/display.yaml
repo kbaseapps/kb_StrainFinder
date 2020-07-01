@@ -50,7 +50,7 @@ parameters :
         short-hint : Output GenomeSet.
 
 description : |
-    <p>StrainFinder v1: Find co-varying haplotype modes to determine how many strains are extant in sample.  Produces a GenomeSet with the Strain Genomes, one Genome object per haplotype linkage.</p>
+  <p>Strain Finder v1 takes as input a reference genome and a Reads Library.  It aligns the reads to the reference genome to find SNPs in the reads, then finds maximum likelihood estimates for the strain genotypes and the strain frequencies.</p>
 
 
 publications: 
