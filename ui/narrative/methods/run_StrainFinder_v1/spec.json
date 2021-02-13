@@ -1,5 +1,5 @@
 {
-    "ver": "0.0.1",
+    "ver": "0.1.0",
     "authors": [
         "dylan", "jmc", "caozhichongchong"
     ],
@@ -24,10 +24,10 @@
             }
         },
         {
-            "id": "in_readslib_ref",
+            "id": "in_readslib_refs",
             "optional": false,
             "advanced": false,
-            "allow_multiple": false,
+            "allow_multiple": true,
             "default_values": null,
             "field_type": "text",
             "text_options": {
@@ -35,7 +35,8 @@
                     "KBaseFile.PairedEndLibrary",
                     "KBaseFile.SingleEndLibrary",
                     "KBaseAssembly.PairedEndLibrary",
-                    "KBaseAssembly.SingleEndLibrary"
+                    "KBaseAssembly.SingleEndLibrary",
+		    "KBaseSets.ReadsSet"
                 ]
             }
         },
@@ -95,9 +96,9 @@
 		    "target_argument_position": 0
                 },
                 {
-                    "input_parameter": "in_readslib_ref",
-                    "target_property": "in_readslib_ref",
-                    "target_type_transform": "resolved-ref",
+                    "input_parameter": "in_readslib_refs",
+                    "target_property": "in_readslib_refs",
+                    "target_type_transform": "list<resolved-ref>",
 		    "target_argument_position": 0
                 },
                 {

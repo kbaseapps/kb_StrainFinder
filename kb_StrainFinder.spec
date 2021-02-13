@@ -12,7 +12,7 @@ module kb_StrainFinder {
 	string workspace_name;
         string in_genome_ref;
         /*string in_vcf_refs;*/  /* not ready yet */
-        string in_readslib_ref;
+        list<string> in_readslib_refs;
 	string out_genomeSet_obj_name;
 
 	int min_mapping_quality;
