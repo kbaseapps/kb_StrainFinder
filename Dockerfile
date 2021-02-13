@@ -8,7 +8,8 @@ MAINTAINER KBase Developer
 
 RUN apt-get update
 RUN pip install openopt numpy scipy FuncDesigner DerApproximator Cython
-
+#RUN apt-get -y install build-essential libssl-dev
+ 
 
 # -----------------------------------------
 
@@ -19,7 +20,10 @@ RUN chmod -R a+rw /kb/module
 WORKDIR /kb/module
 RUN make all
 
-RUN git clone https://bitbucket.org/yonatanf/strainfinder
+#RUN git clone https://bitbucket.org/yonatanf/strainfinder
+RUN curl -o yonatanf-strainfinder-2868046ef82b.zip https://bitbucket.org/yonatanf/strainfinder/get/2868046ef82b.zip && \
+    unzip yonatanf-strainfinder-2868046ef82b.zip && \
+    ln -s yonatanf-strainfinder-2868046ef82b strainfinder
 WORKDIR /kb/module/strainfinder
 RUN python setup_cython.py build_ext --inplace
 ENV PATH $PATH:/kb/module/strainfinder

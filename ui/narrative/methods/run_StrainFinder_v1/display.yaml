@@ -33,9 +33,9 @@ parameters :
         ui-name    : Reference genome
         short-hint : Genome to align reads to (single genome only at this time)
 
-    in_readslib_ref :
-        ui-name    : Reads library
-        short-hint : Input reads library (single library only at this time)
+    in_readslib_refs :
+        ui-name    : Reads libraries
+        short-hint : Input Reads Libraries or Reads Set
 
     min_mapping_quality :
         ui-name    : Minimum mapping quality
