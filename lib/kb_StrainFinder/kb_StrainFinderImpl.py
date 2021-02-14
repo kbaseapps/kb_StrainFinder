@@ -18,7 +18,8 @@ from installed_clients.ReadsUtilsClient import ReadsUtils
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.AssemblyUtilClient import AssemblyUtil
-from installed_clients.SetAPIClient import SetAPI
+#from installed_clients.SetAPIServiceClient import SetAPI_Service  # if you want to use the service wizard
+from installed_clients.SetAPIClient import SetAPI  # if you want to run as SDK_LOCAL
 
 from installed_clients.kb_meta_decoderClient import kb_meta_decoder
 
@@ -254,7 +255,8 @@ class kb_StrainFinder:
         except Exception as e:
             raise ValueError('Unable to get AssemblyUtil Client' +"\n" + str(e))
         try:
-            SetAPI_Client = SetAPI (url=self.serviceWizardURL, token=token)  # Service
+            #setAPI_Client = SetAPI_Service (url=self.serviceWizardURL, token=token, service_ver=SERVICE_VER)  # Service
+            setAPI_Client = SetAPI (url=self.callbackURL, token=token, service_ver=SERVICE_VER)  # SDK Local
         except Exception as e:
             raise ValueError('Unable to get SetAPI Client' +"\n" + str(e))
             
@@ -310,8 +312,7 @@ class kb_StrainFinder:
             # ReadsSet
             if type_name in ['KBaseSets.ReadsSet']:
                 try:
-                    input_readsSet_obj = self.setAPI_Client.get_reads_set_v1 ({'ref':input_ref,'include_item_info':1})
-
+                    input_readsSet_obj = setAPI_Client.get_reads_set_v1 ({'ref':input_ref,'include_item_info':1})
                 except Exception as e:
                     raise ValueError('SetAPI FAILURE: Unable to get read library set object from workspace: (' + str(input_ref)+")\n" + str(e))
 
@@ -714,6 +715,7 @@ str(input_reads_ref) +')' + str(e))
         all_new_genome_refs = []
         all_new_genome_names = []
         all_set_elements = dict()
+        num_strain_genomes_generated = 0
         for reads_lib_i,reads_lib_ref in enumerate(expanded_reads_refs):
             self.log(console, "GETTING ALLELES FOR STRAIN MODES for ReadsLib "+str(reads_lib_i+1))
             fitted_genomes_file = fitted_genomes_files[reads_lib_i]
@@ -724,202 +726,205 @@ str(input_reads_ref) +')' + str(e))
             num_genomes_found = len(fitted_genomes_rows[0])
             #num_genomes_found_per_readslib.append(num_genomes_found)
             
-            # only one strain mode
+            # only one strain mode (may not be same as reference so do generate strain genome
             if num_genomes_found == 1:
-                msg = "ReadsLib "+str(reads_lib_i)+": StrainFinder found only one strain in the data.  Not creating new genome objects."
+                msg = "ReadsLib "+str(reads_lib_i)+": StrainFinder found only one strain in the data.  Not creating GenomeSet for Reads Library "+str(reads_lib_i+1)
                 self.log(console, msg)
                 report_text += msg+"\n"
 
             # multiple strain modes
-            else:
-
-                # set provenance to just include this reads lib for input_ws_objects
-                this_provenance = provenance
-                this_provenance[0]['input_ws_objects']=[]
-                this_provenance[0]['input_ws_objects'].append(params['in_genome_ref'])
-                this_provenance[0]['input_ws_objects'].append(reads_lib_ref)
+            num_strain_genomes_generated += num_genomes_found
                 
-                ####  Make revised Assembly Fasta
-                ##
-                new_fasta_files = []
-                for genome_i in range(num_genomes_found):
-                    new_genome_fasta = dict()
-                    new_genome_headers = dict()
-                    new_genome_fasta_len = dict()
-                    for contigID in base_genome_contigID_order:
-                        new_genome_fasta[contigID] = base_genome_fasta[contigID]
-                        new_genome_headers[contigID] = base_genome_headers[contigID]
-                        new_genome_fasta_len[contigID] = len(base_genome_fasta[contigID])
-                    for row_i,row in enumerate(fitted_genomes_rows):
-                        this_allele = row[genome_i]
-                        [this_contigID, this_pos_n] = position_row_index[row_i].split("\t")
-                        pos_i = int(this_pos_n)-1
-                        if pos_i == 0:
-                            new_genome_fasta[this_contigID] = this_allele + new_genome_fasta[this_contigID][pos_i+1:]
-                        elif pos_i == new_genome_fasta_len[this_contigID]-1:
-                            new_genome_fasta[this_contigID] = new_genome_fasta[this_contigID][:pos_i] + this_allele
-                        else:
-                            new_genome_fasta[this_contigID] = new_genome_fasta[this_contigID][:pos_i] + this_allele + new_genome_fasta[this_contigID][pos_i+1:]
+            # set provenance to just include this reads lib for input_ws_objects
+            this_provenance = provenance
+            this_provenance[0]['input_ws_objects']=[]
+            this_provenance[0]['input_ws_objects'].append(params['in_genome_ref'])
+            this_provenance[0]['input_ws_objects'].append(reads_lib_ref)
+            
+            ####  Make revised Assembly Fasta
+            ##
+            new_fasta_files = []
+            for genome_i in range(num_genomes_found):
+                new_genome_fasta = dict()
+                new_genome_headers = dict()
+                new_genome_fasta_len = dict()
+                for contigID in base_genome_contigID_order:
+                    new_genome_fasta[contigID] = base_genome_fasta[contigID]
+                    new_genome_headers[contigID] = base_genome_headers[contigID]
+                    new_genome_fasta_len[contigID] = len(base_genome_fasta[contigID])
+                for row_i,row in enumerate(fitted_genomes_rows):
+                    this_allele = row[genome_i]
+                    [this_contigID, this_pos_n] = position_row_index[row_i].split("\t")
+                    pos_i = int(this_pos_n)-1
+                    if pos_i == 0:
+                        new_genome_fasta[this_contigID] = this_allele + new_genome_fasta[this_contigID][pos_i+1:]
+                    elif pos_i == new_genome_fasta_len[this_contigID]-1:
+                        new_genome_fasta[this_contigID] = new_genome_fasta[this_contigID][:pos_i] + this_allele
+                    else:
+                        new_genome_fasta[this_contigID] = new_genome_fasta[this_contigID][:pos_i] + this_allele + new_genome_fasta[this_contigID][pos_i+1:]
 
-                    this_fasta_file = os.path.join(output_dir, 'new_fasta-'+str(reads_lib_i)+'-'+str(genome_i)+'-'+str(uuid.uuid4())+'.fasta')
-                    new_fasta_files.append(this_fasta_file)
-                    with open (this_fasta_file, 'w') as this_fasta_handle:
-                        for contigID in base_genome_contigID_order:
-                            this_fasta_handle.write(new_genome_headers[contigID]+"\n")
-                            this_fasta_handle.write(new_genome_fasta[contigID]+"\n")
+                this_fasta_file = os.path.join(output_dir, 'new_fasta-'+str(reads_lib_i)+'-'+str(genome_i)+'-'+str(uuid.uuid4())+'.fasta')
+                new_fasta_files.append(this_fasta_file)
+                with open (this_fasta_file, 'w') as this_fasta_handle:
+                    for contigID in base_genome_contigID_order:
+                        this_fasta_handle.write(new_genome_headers[contigID]+"\n")
+                        this_fasta_handle.write(new_genome_fasta[contigID]+"\n")
                 
                         
-                #### Check for stop codons and if yes, adjust GFFs
-                ##
-                self.log(console, "READING FEATURES")
-                SNP_pos = dict()
-                SNP_CDS = dict()
+            #### Check for stop codons and if yes, adjust GFFs
+            ##
+            self.log(console, "READING FEATURES")
+            SNP_pos = dict()
+            SNP_CDS = dict()
 
-                # initialize and determine SNP positions
-                for contigID in base_genome_contigID_order:
-                    SNP_pos[contigID] = []
-                    SNP_CDS[contigID] = dict()
-                for row_i,row in enumerate(fitted_genomes_rows):
-                    [this_contigID, this_pos_n] = position_row_index[row_i].split("\t")
-                    SNP_pos[this_contigID].append(int(this_pos_n))
+            # initialize and determine SNP positions
+            for contigID in base_genome_contigID_order:
+                SNP_pos[contigID] = []
+                SNP_CDS[contigID] = dict()
+            for row_i,row in enumerate(fitted_genomes_rows):
+                [this_contigID, this_pos_n] = position_row_index[row_i].split("\t")
+                SNP_pos[this_contigID].append(int(this_pos_n))
 
-                # read base genome feature locations and determine which have SNPs
+            # read base genome feature locations and determine which have SNPs
+            with open (input_genome_gff_file, 'r') as gff_handle:
+                for gff_line in gff_handle.readlines():
+                    gff_line = gff_line.rstrip()
+                    if gff_line.startswith('#'):
+                        continue
+                    [contigID, annot_db, locus_type, beg_str, end_str, d1, strand, d2, info] = gff_line.split("\t")
+                    beg = int(beg_str)
+                    end = int(end_str)
+                    feature_has_SNP = False
+                    for pos_n in SNP_pos[contigID]:
+                        if pos_n >= beg and pos_n <= end:
+                            feature_has_SNP = True
+                            break
+                    if feature_has_SNP:
+                        report_text += gff_line+"\n"
+                        if locus_type == 'CDS':
+                            loc = ",".join([str(beg),str(end),strand])
+                            SNP_CDS[contigID][loc] = True
+
+            # build strain genomes
+            new_gff_files = []
+            for genome_i in range(num_genomes_found):
+                new_gff_buf = []
                 with open (input_genome_gff_file, 'r') as gff_handle:
                     for gff_line in gff_handle.readlines():
                         gff_line = gff_line.rstrip()
                         if gff_line.startswith('#'):
+                            new_gff_buf.append(gff_line)
                             continue
                         [contigID, annot_db, locus_type, beg_str, end_str, d1, strand, d2, info] = gff_line.split("\t")
-                        beg = int(beg_str)
-                        end = int(end_str)
-                        feature_has_SNP = False
-                        for pos_n in SNP_pos[contigID]:
-                            if pos_n >= beg and pos_n <= end:
-                                feature_has_SNP = True
-                                break
-                        if feature_has_SNP:
-                            report_text += gff_line+"\n"
-                            if locus_type == 'CDS':
-                                loc = ",".join([str(beg),str(end),strand])
-                                SNP_CDS[contigID][loc] = True
+                        # this will cover both CDS and parent gene
+                        loc = ",".join([str(beg),str(end),strand])
+                        if loc not in SNP_CDS[contigID]:  
+                            new_gff_buf.append(gff_line)
+                            continue
+                        # else check for altered stop
+                        contig_len = len(base_genome_fasta[contigID])
+                        if end <= contig_len:
+                            nuc_seq = base_genome_fasta[contigID][beg-1:end]
+                        else:
+                            nuc_seq = base_genome_fasta[contigID][beg-1:contig_len] + \
+                                      base_genome_fasta[contigID][0:end-contig_len+1]
+                        if strand == '-':
+                            nuc_seq = self._reverse_complement(nuc_seq)
+                        prot_seq = self._translate_nuc_to_prot_seq(nuc_seq=nuc_seq, keep_stop=True, truncate_to_stop=True)
+                        old_len = end - beg + 1
+                        new_len = 3 * len(prot_seq)
+                        if new_len == old_len and prot_seq.endswith('*'):
+                            new_gff_buf.append(gff_line)
+                            continue
 
-                # build strain genomes
-                new_gff_files = []
-                for genome_i in range(num_genomes_found):
-                    new_gff_buf = []
-                    with open (input_genome_gff_file, 'r') as gff_handle:
-                        for gff_line in gff_handle.readlines():
-                            gff_line = gff_line.rstrip()
-                            if gff_line.startswith('#'):
-                                new_gff_buf.append(gff_line)
-                                continue
-                            [contigID, annot_db, locus_type, beg_str, end_str, d1, strand, d2, info] = gff_line.split("\t")
-                            # this will cover both CDS and parent gene
-                            loc = ",".join([str(beg),str(end),strand])
-                            if loc not in SNP_CDS[contigID]:  
-                                new_gff_buf.append(gff_line)
-                                continue
-                            # else check for altered stop
-                            contig_len = len(base_genome_fasta[contigID])
-                            if end <= contig_len:
-                                nuc_seq = base_genome_fasta[contigID][beg-1:end]
-                            else:
-                                nuc_seq = base_genome_fasta[contigID][beg-1:contig_len] + \
-                                          base_genome_fasta[contigID][0:end-contig_len+1]
+                        if not prot_seq.endswith('*'):
                             if strand == '-':
-                                nuc_seq = self._reverse_complement(nuc_seq)
-                            prot_seq = self._translate_nuc_to_prot_seq(nuc_seq=nuc_seq, keep_stop=True, truncate_to_stop=True)
-                            old_len = end - beg + 1
-                            new_len = 3 * len(prot_seq)
-                            if new_len == old_len and prot_seq.endswith('*'):
-                                new_gff_buf.append(gff_line)
-                                continue
-
-                            if not prot_seq.endswith('*'):
-                                if strand == '-':
-                                    new_nuc_seq = self._reverse_complement(base_genome_fasta[contigID][0:end])
-                                else:
-                                    new_nuc_seq = base_genome_fasta[contigID][beg-1:contig_len]
-                                new_prot_seq = self._translate_nuc_to_prot_seq(nuc_seq=new_nuc_seq, keep_stop=True, truncate_to_stop=True)
-                                new_len = 3 * len(new_prot_seq)
-
-                            # adjust feature coords
-                            if strand == '-':
-                                new_beg = end - new_len+1
-                                new_end = end
+                                new_nuc_seq = self._reverse_complement(base_genome_fasta[contigID][0:end])
                             else:
-                                new_beg = beg 
-                                new_end = beg + new_len-1
+                                new_nuc_seq = base_genome_fasta[contigID][beg-1:contig_len]
+                            new_prot_seq = self._translate_nuc_to_prot_seq(nuc_seq=new_nuc_seq, keep_stop=True, truncate_to_stop=True)
+                            new_len = 3 * len(new_prot_seq)
 
-                            if new_end <= contig_len:
-                                new_gff_line = "\t".join([contigID, annot_db, locus_type, str(new_beg), str(new_end), d1, strand, d2, info])
+                        # adjust feature coords
+                        if strand == '-':
+                            new_beg = end - new_len+1
+                            new_end = end
+                        else:
+                            new_beg = beg 
+                            new_end = beg + new_len-1
+
+                        if new_end <= contig_len:
+                            new_gff_line = "\t".join([contigID, annot_db, locus_type, str(new_beg), str(new_end), d1, strand, d2, info])
+                            new_gff_buf.append(new_gff_line)
+                        else:
+                            if new_beg > contig_len:
+                                new_beg_p1 = new_beg - contig_len
+                                new_end_p1 = new_end - contig_len
+                                new_gff_line = "\t".join([contigID, annot_db, locus_type, str(new_beg_p1), str(new_end_p1), d1, strand, d2, info])
                                 new_gff_buf.append(new_gff_line)
-                            else:
-                                if new_beg > contig_len:
-                                    new_beg_p1 = new_beg - contig_len
-                                    new_end_p1 = new_end - contig_len
-                                    new_gff_line = "\t".join([contigID, annot_db, locus_type, str(new_beg_p1), str(new_end_p1), d1, strand, d2, info])
-                                    new_gff_buf.append(new_gff_line)
-                                else:  # break into two
-                                    new_beg_p1 = new_beg
-                                    new_end_p1 = contig_len
-                                    new_beg_p2 = 1
-                                    new_end_p2 = new_end - contig_len
-                                    new_gff_line_p1 = "\t".join([contigID, annot_db, locus_type, str(new_beg_p1), str(new_end_p1), d1, strand, d2, info])
-                                    new_gff_line_p2 = "\t".join([contigID, annot_db, locus_type, str(new_beg_p2), str(new_end_p2), d1, strand, d2, info])
-                                    new_gff_buf.append(new_gff_line_p1)
-                                    new_gff_buf.append(new_gff_line_p2)
+                            else:  # break into two
+                                new_beg_p1 = new_beg
+                                new_end_p1 = contig_len
+                                new_beg_p2 = 1
+                                new_end_p2 = new_end - contig_len
+                                new_gff_line_p1 = "\t".join([contigID, annot_db, locus_type, str(new_beg_p1), str(new_end_p1), d1, strand, d2, info])
+                                new_gff_line_p2 = "\t".join([contigID, annot_db, locus_type, str(new_beg_p2), str(new_end_p2), d1, strand, d2, info])
+                                new_gff_buf.append(new_gff_line_p1)
+                                new_gff_buf.append(new_gff_line_p2)
                                     
-                    this_gff_file = os.path.join(output_dir, 'new_gff-'+str(reads_lib_i)+'-'+str(genome_i)+'-'+str(uuid.uuid4())+'.gff')
-                    new_gff_files.append(this_gff_file)
-                    with open (this_gff_file, 'w') as this_gff_handle:
-                        for gff_line in new_gff_buf:
-                            this_gff_handle.write(gff_line+"\n")
+                this_gff_file = os.path.join(output_dir, 'new_gff-'+str(reads_lib_i)+'-'+str(genome_i)+'-'+str(uuid.uuid4())+'.gff')
+                new_gff_files.append(this_gff_file)
+                with open (this_gff_file, 'w') as this_gff_handle:
+                    for gff_line in new_gff_buf:
+                        this_gff_handle.write(gff_line+"\n")
 
                         
-                #### STEP 12: Upload Strain Genomes and make GenomeSet for this ReadsLib
-                ##
-                self.log(console, "UPLOADING GENOMES for ReadsLib "+str(reads_lib_i+1))
-                new_genome_refs = []
-                new_genome_names = []
-                set_elements = dict()
-                #items = []
+            #### STEP 12: Upload Strain Genomes and make GenomeSet for this ReadsLib
+            ##
+            self.log(console, "UPLOADING GENOMES for ReadsLib "+str(reads_lib_i+1))
+            new_genome_refs = []
+            new_genome_names = []
+            set_elements = dict()
+            #items = []
 
-                for genome_i in range(num_genomes_found):
-                    new_genome_obj_name = params['out_genomeSet_obj_name']+'-Reads_'+str(reads_lib_i+1)+'-Strain_'+str(genome_i+1)+'.Genome'
-                    self.log(console, "UPLOADING "+new_genome_obj_name)
-                    new_genome_ref = gfuClient.fasta_gff_to_genome({
-                        'workspace_name': params['workspace_name'],
-                        'fasta_file': {'path': new_fasta_files[genome_i]},
-                        'gff_file': {'path': new_gff_files[genome_i]},
-                        'genome_name': new_genome_obj_name,
-                        'scientific_name': src_scientific_name,
-                        'source': src_source,
-                        'release': src_release,
-                        'genetic_code': src_genetic_code
-                    })['genome_ref']
+            for genome_i in range(num_genomes_found):
+                new_genome_obj_name = re.sub(r'\.[^\.]+$','',params['out_genomeSet_obj_name'])
+                new_genome_obj_name += '-Reads_'+str(reads_lib_i+1)+'-Strain_'+str(genome_i+1)+'.Genome'
+                new_genome_obj_name += ".Genome"
+                self.log(console, "UPLOADING "+new_genome_obj_name)
+                new_genome_ref = gfuClient.fasta_gff_to_genome({
+                    'workspace_name': params['workspace_name'],
+                    'fasta_file': {'path': new_fasta_files[genome_i]},
+                    'gff_file': {'path': new_gff_files[genome_i]},
+                    'genome_name': new_genome_obj_name,
+                    'scientific_name': src_scientific_name,
+                    'source': src_source,
+                    'release': src_release,
+                    'genetic_code': src_genetic_code
+                })['genome_ref']
 
-                    new_genome_names.append(new_genome_obj_name)
-                    new_genome_refs.append(new_genome_ref)
-                    all_new_genome_names.append(new_genome_obj_name)
-                    all_new_genome_refs.append(new_genome_ref)
+                new_genome_names.append(new_genome_obj_name)
+                new_genome_refs.append(new_genome_ref)
+                all_new_genome_names.append(new_genome_obj_name)
+                all_new_genome_refs.append(new_genome_ref)
                     
-                    set_elements[new_genome_obj_name] = dict()
-                    set_elements[new_genome_obj_name]['ref'] = new_genome_ref
-                    all_set_elements[new_genome_obj_name] = dict()
-                    all_set_elements[new_genome_obj_name]['ref'] = new_genome_ref
+                set_elements[new_genome_obj_name] = dict()
+                set_elements[new_genome_obj_name]['ref'] = new_genome_ref
+                all_set_elements[new_genome_obj_name] = dict()
+                all_set_elements[new_genome_obj_name]['ref'] = new_genome_ref
 
-                # attach created Genome objs to report
-                for genome_i in range(num_genomes_found):
-                    objects_created.append({'ref': new_genome_refs[genome_i],
+            # attach created Genome objs to report
+            for genome_i in range(num_genomes_found):
+                objects_created.append({'ref': new_genome_refs[genome_i],
                                             'description': new_genome_names[genome_i]+' StrainFinder Genome'})
 
-                # DEBUG
-                #self.log(console, 'SET:'+"\n"+pformat(set_elements))
-                #self.log(console, 'PROV:'+"\n"+pformat(this_provenance))
-                # HERE
+            # DEBUG
+            #self.log(console, 'SET:'+"\n"+pformat(set_elements))
+            #self.log(console, 'PROV:'+"\n"+pformat(this_provenance))
+            # HERE
                     
-                # create GenomeSet for this ReadsLib
+            # create GenomeSet for this ReadsLib
+            if num_genomes_found > 1 and len(expanded_reads_refs) > 1:
                 genomeSet_name = params['out_genomeSet_obj_name']+'-Reads_'+str(reads_lib_i+1)
                 genomeSet_obj = { 'description': 'Strain Genomes of '+input_genome_obj_name+' from ReadsLib '+str(reads_lib_i+1),
                                   #'items': items
@@ -948,15 +953,16 @@ str(input_reads_ref) +')' + str(e))
                                         'description': 'StrainFinder GenomeSet for ReadsLib '+str(reads_lib_i+1)})
 
 
-                #### STEP 13: Add haplotype impact on genotype to Report?  Just minimally for now
-                ##
-                self.log(console, "ANALYZING GENOTYPES")
-                for genome_i in range(num_genomes_found):
-                    report_text += str(100*(float(abund_vec[genome_i])))+' %'+"\n"
+            #### STEP 13: Add haplotype impact on genotype to Report?  Just minimally for now
+            ##
+            self.log(console, "ANALYZING GENOTYPES")
+            for genome_i in range(num_genomes_found):
+                report_text += str(100*(float(abund_vec[genome_i])))+' %'+"\n"
                 
                     
-            #### STEP 14: create GenomeSet for all generated Strains
-            ##
+        #### STEP 14: create GenomeSet for all generated Strains
+        ##
+        if num_strain_genomes_generated > 1:
             genomeSet_name = params['out_genomeSet_obj_name']
             genomeSet_obj = { 'description': 'Strain Genomes of '+input_genome_obj_name+' from ALL ReadsLibs',
                               #'items': items
@@ -980,7 +986,7 @@ str(input_reads_ref) +')' + str(e))
             genomeSet_ref = '/'.join([str(new_obj_info[WORKSPACE_I]),
                                       str(new_obj_info[OBJID_I]),
                                       str(new_obj_info[VERSION_I])])
-                
+            
             objects_created.append({'ref': genomeSet_ref,
                                     'description': 'StrainFinder GenomeSet for ALL ReadsLibs'})
 
