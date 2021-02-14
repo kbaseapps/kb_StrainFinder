@@ -6,6 +6,7 @@
 * fixed ReadsSet SetAPI failure and added unit test
 * removed extra GenomeSet outputs when unnecessary
 * improved output Genome obj name
+* added Github Actions automatic tests
 
 0.1.0
 -----

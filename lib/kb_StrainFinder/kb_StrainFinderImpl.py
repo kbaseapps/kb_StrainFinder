@@ -889,7 +889,7 @@ str(input_reads_ref) +')' + str(e))
 
             for genome_i in range(num_genomes_found):
                 new_genome_obj_name = re.sub(r'\.[^\.]+$','',params['out_genomeSet_obj_name'])
-                new_genome_obj_name += '-Reads_'+str(reads_lib_i+1)+'-Strain_'+str(genome_i+1)+'.Genome'
+                new_genome_obj_name += '-Reads_'+str(reads_lib_i+1)+'-Strain_'+str(genome_i+1)
                 new_genome_obj_name += ".Genome"
                 self.log(console, "UPLOADING "+new_genome_obj_name)
                 new_genome_ref = gfuClient.fasta_gff_to_genome({
