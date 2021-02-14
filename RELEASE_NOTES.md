@@ -1,6 +1,12 @@
 # kb_StrainFinder release notes
 =========================================
 
+0.1.1
+-----
+* fixed ReadsSet SetAPI failure and added unit test
+* removed extra GenomeSet outputs when unnecessary
+* improved output Genome obj name
+
 0.1.0
 -----
 * porting to multiple input reads libs to pass to kb_meta_decoder.call_variants()

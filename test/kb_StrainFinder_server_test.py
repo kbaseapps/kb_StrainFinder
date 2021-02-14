@@ -168,7 +168,7 @@ class kb_StrainFinderTest(unittest.TestCase):
                                        
     # test_run_StrainFinder_v1_01: one read library
     #
-    @unittest.skip("skipped test_run_StrainFinder_v1_01()")  # uncomment to skip
+    # HIDE @unittest.skip("skipped test_run_StrainFinder_v1_01()")  # uncomment to skip
     #
     def test_run_StrainFinder_v1_01(self):
         method = 'test_run_StrainFinder_v1_01'
@@ -213,6 +213,66 @@ class kb_StrainFinderTest(unittest.TestCase):
             'workspace_name': self.getWsName(),
             'in_genome_ref': self.genome_ref,
             'in_readslib_refs': [self.reads_refs[0], self.reads_refs[1]],
+            'out_genomeSet_obj_name': output_name,
+            'min_mapping_quality': 30,
+            'min_depth': 50
+        }
+        result = self.getImpl().run_StrainFinder_v1(self.getContext(),params)
+
+        print("\nRESULT:")
+        pprint(result)
+        pass
+
+
+    # test_run_StrainFinder_v1_03: reads set input
+    #
+    # HIDE @unittest.skip("skipped test_run_StrainFinder_v1_03()")  # uncomment to skip
+    #
+    def test_run_StrainFinder_v1_03(self):
+        method = 'test_run_StrainFinder_v1_03'
+        
+        print ("\n\nRUNNING "+method+"()")
+        print ("===========================================\n\n")
+
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I,
+         CHSUM_I, SIZE_I, META_I] = list(range(11))  # object_info tuple
+        
+        self.prepare_data()
+
+        # build ReadsSet obj
+        items = []
+        for lib_ref in self.reads_refs:
+            items.append({'ref': lib_ref,
+                          'label': 'method-'+lib_ref
+                          })
+        readsSet_obj = {'description': 'test ReadsSet for '+method,
+                        'items': items
+        }
+        obj_info = self.getWsClient().save_objects({'workspace': self.getWsName(),       
+                                                    'objects': [
+                                                        {
+                                                            'type': 'KBaseSets.ReadsSet',
+                                                            'data': readsSet_obj,
+                                                            'name': 'test_readsset-'+method,
+                                                            'meta': {},
+                                                            'provenance':[
+                                                                {
+                                                                    'service':'kb_StrainFinder',
+                                                                    'method':'test_kb_StrainFinder'
+                                                                }
+                                                            ]
+                                                        }]
+                                                })[0]
+        reads_set_ref = '/'.join([str(obj_info[WSID_I]),
+                                  str(obj_info[OBJID_I]),
+                                  str(obj_info[VERSION_I])])
+                                       
+        # run method
+        output_name = method+'_output'
+        params = {
+            'workspace_name': self.getWsName(),
+            'in_genome_ref': self.genome_ref,
+            'in_readslib_refs': [reads_set_ref],
             'out_genomeSet_obj_name': output_name,
             'min_mapping_quality': 30,
             'min_depth': 50
