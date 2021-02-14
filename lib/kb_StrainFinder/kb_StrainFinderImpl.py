@@ -1036,7 +1036,7 @@ str(input_reads_ref) +')' + str(e))
         reportObj['direct_html_link_index'] = metadecoder_call_variants_reportObj['direct_html_link_index']
         reportObj['html_links'] = html_links
         reportObj['file_links'] = file_links
-        reportObj['objects_created'] = objects_created
+        reportObj['objects_created'] = objects_created.reverse()  # this displays better order
         if report_text:
             reportObj['message'] = report_text
             
