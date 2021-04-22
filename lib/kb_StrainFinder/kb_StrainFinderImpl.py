@@ -800,7 +800,7 @@ str(input_reads_ref) +')' + str(e))
                             feature_has_SNP = True
                             break
                     if feature_has_SNP:
-                        report_text += gff_line+"\n"
+                        #report_text += gff_line+"\n"  # too big to include
                         if locus_type == 'CDS':
                             loc = ",".join([str(beg),str(end),strand])
                             SNP_CDS[contigID][loc] = True
@@ -916,7 +916,7 @@ str(input_reads_ref) +')' + str(e))
             # attach created Genome objs to report
             for genome_i in range(num_genomes_found):
                 objects_created.append({'ref': new_genome_refs[genome_i],
-                                            'description': new_genome_names[genome_i]+' StrainFinder Genome'})
+                                        'description': new_genome_names[genome_i]+' StrainFinder Genome'})
 
             # DEBUG
             #self.log(console, 'SET:'+"\n"+pformat(set_elements))
@@ -957,7 +957,7 @@ str(input_reads_ref) +')' + str(e))
             ##
             self.log(console, "ANALYZING GENOTYPES")
             for genome_i in range(num_genomes_found):
-                report_text += str(100*(float(abund_vec[genome_i])))+' %'+"\n"
+                report_text += 'GENOME '+str(genome_i+1)+': '+str(100*(float(abund_vec[genome_i])))+' %'+"\n"
                 
                     
         #### STEP 14: create GenomeSet for all generated Strains
@@ -997,7 +997,7 @@ str(input_reads_ref) +')' + str(e))
 
         # instantiate report object
         reportName = method+'_report_' + str(uuid.uuid4())
-        reportObj = {'objects_created': [],
+        reportObj = {#'objects_created': [],
                      'direct_html_link_index': 0,
                      'file_links': [],
                      'html_links': [],
@@ -1036,7 +1036,9 @@ str(input_reads_ref) +')' + str(e))
         reportObj['direct_html_link_index'] = metadecoder_call_variants_reportObj['direct_html_link_index']
         reportObj['html_links'] = html_links
         reportObj['file_links'] = file_links
-        reportObj['objects_created'] = objects_created.reverse()  # this displays better order
+        if len(objects_created) > 0:
+            reportObj['objects_created'] = objects_created
+            #reportObj['objects_created'] = objects_created.reverse()  # this displays better order (I think)
         if report_text:
             reportObj['message'] = report_text
             
