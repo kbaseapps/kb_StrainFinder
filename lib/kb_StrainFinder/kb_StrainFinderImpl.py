@@ -434,7 +434,7 @@ str(input_reads_ref) +')' + str(e))
             'reads_refs': expanded_reads_refs,
             'min_mapping_quality': params['min_mapping_quality'],
             'min_depth': params['min_depth'],
-            'output_vcf': params['out_genomeSet_obj_name']+'.VCF'
+            'output_vcf': params['out_genomeSet_obj_name']+'.VCF'  # may need to make separate names
         }
         #MD_SERVICE_VER = 'release'
         MD_SERVICE_VER = 'dev'
@@ -486,15 +486,18 @@ str(input_reads_ref) +')' + str(e))
                     vcf_seen_cnt += 1
                     if vcf_seen_cnt == (reads_lib_i+1):
                         vcf_shock_handle_id = file_link['handle']  # not 'handle_id'
+                        #self.log(console,"VCF label selected: "+file_link['label'])  # DEBUG
                         break
             if not vcf_shock_handle_id:
                 raise ValueError ("Failure to find VCF in SHOCK from alignment submethod")
-            vcf_file = os.path.join(self.scratch, params['out_genomeSet_obj_name']+'.vcf')
+            vcf_file = os.path.join(self.scratch, params['out_genomeSet_obj_name']+'-'+str(reads_lib_i)+'.vcf')
             vcf_dl_result = dfuClient.shock_to_file({'handle_id': vcf_shock_handle_id,
                                                      'file_path': vcf_file,
                                                      'unpack': 'uncompress'
             })
             vcf_files.append(vcf_file)
+            self.log(console,"VCF file: "+vcf_file)  # DEBUG
+            
             # DEBUG
             #with open(vcf_file, 'r') as vcf_file_handle:
             #    for line in vcf_file_handle.readlines():
@@ -504,11 +507,11 @@ str(input_reads_ref) +')' + str(e))
         #### STEP 7: Parse VCF to get polymorphism frequencies
         ##
         run_dirs_list = []
-        if DEBUG_MODE == 1:
-            vcf_files = ["/kb/module/dev_test/data/Bin.002-37A_testACGT_ploidy1_alternate_2.vcf"]  # DEBUG]
+        position_row_index = []
         for reads_lib_i,reads_ref in enumerate(expanded_reads_refs):
             self.log(console, "Parsing VCF to polymorphism frequencies for ReadsLib "+str(reads_lib_i+1))
             vcf_file = vcf_files[reads_lib_i]
+            #self.log(console,"VCF file: "+vcf_file)  # DEBUG
             vcf_buf = []
             SNP_freqs = dict()
                          
@@ -570,15 +573,16 @@ str(input_reads_ref) +')' + str(e))
                 os.makedirs (this_run_dir)
             run_dirs_list.append(this_run_dir)
             allele_counts_file = os.path.join(this_run_dir, 'allele_counts.txt')
+            #self.log(console,"ALLELE COUNTS file: "+allele_counts_file)  # DEBUG
             if os.path.exists(allele_counts_file):
                 shutil.move(allele_counts_file, allele_counts_file+'.orig-'+str(reads_lib_i))
 
             allele_counts_buf = []
-            position_row_index = []
+            position_row_index.append([])
             allele_counts_buf.append("\t".join(['# A', 'C', 'G', 'T'])+"\n")
             for contig_id in sorted(SNP_freqs.keys()):
                 for pos in sorted(SNP_freqs[contig_id].keys()):
-                    position_row_index.append("\t".join([contig_id, pos]))
+                    position_row_index[reads_lib_i].append("\t".join([contig_id, pos]))
                     allele_counts_buf.append("\t".join(list(map(str, SNP_freqs[contig_id][pos])))+"\n")
 
             with open (allele_counts_file, 'w') as allele_counts_handle:
@@ -600,6 +604,7 @@ str(input_reads_ref) +')' + str(e))
             fitted_genomes_file = os.path.join(this_run_dir, 'fitted_genomes.txt')
             if os.path.exists(fitted_genomes_file):
                 os.remove(fitted_genomes_file)
+            #self.log(console,"FITTED GENOMES file: "+fitted_genomes_file)  # DEBUG
 
             # Some subprocesses require shell=True in order to see input data
             #  also, if you do a redirect to out, you must join command first
@@ -634,6 +639,7 @@ str(input_reads_ref) +')' + str(e))
                 if not line: break
                 self.log(console, line.replace('\n', ''))
                 if line.startswith('Inferred strain relative abundances = ['):
+                    #self.log(console,line)  # DEBUG
                     inferred_abundances = line.replace('Inferred strain relative abundances = [','')
                     inferred_abundances = inferred_abundances.replace(']','')
                     inferred_abundances = inferred_abundances.strip()
@@ -754,7 +760,7 @@ str(input_reads_ref) +')' + str(e))
                     new_genome_fasta_len[contigID] = len(base_genome_fasta[contigID])
                 for row_i,row in enumerate(fitted_genomes_rows):
                     this_allele = row[genome_i]
-                    [this_contigID, this_pos_n] = position_row_index[row_i].split("\t")
+                    [this_contigID, this_pos_n] = position_row_index[reads_lib_i][row_i].split("\t")
                     pos_i = int(this_pos_n)-1
                     if pos_i == 0:
                         new_genome_fasta[this_contigID] = this_allele + new_genome_fasta[this_contigID][pos_i+1:]
@@ -782,7 +788,7 @@ str(input_reads_ref) +')' + str(e))
                 SNP_pos[contigID] = []
                 SNP_CDS[contigID] = dict()
             for row_i,row in enumerate(fitted_genomes_rows):
-                [this_contigID, this_pos_n] = position_row_index[row_i].split("\t")
+                [this_contigID, this_pos_n] = position_row_index[reads_lib_i][row_i].split("\t")
                 SNP_pos[this_contigID].append(int(this_pos_n))
 
             # read base genome feature locations and determine which have SNPs
