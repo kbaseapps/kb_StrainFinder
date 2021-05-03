@@ -1,6 +1,10 @@
 # kb_StrainFinder release notes
 =========================================
 
+0.1.2
+-----
+* fixed repeat strain abundance and position index by reads lib
+
 0.1.1
 -----
 * fixed ReadsSet SetAPI failure and added unit test
