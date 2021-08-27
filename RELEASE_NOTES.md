@@ -1,6 +1,10 @@
 # kb_StrainFinder release notes
 =========================================
 
+0.1.3
+-----
+* updated publications in display.yaml to follow PLoS format
+
 0.1.2
 -----
 * fixed repeat strain abundance and position index by reads lib
