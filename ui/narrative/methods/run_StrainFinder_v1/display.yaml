@@ -50,8 +50,9 @@ parameters :
         short-hint : Output GenomeSet.
 
 description : |
-  <p>Strain Finder v1 takes as input a reference genome and a Reads Library.  It aligns the reads to the reference genome to find SNPs in the reads, then finds maximum likelihood estimates for the strain genotypes and the strain frequencies.</p>
+  <p>Strain Finder v1 takes as input a reference genome and a Reads Library.  It aligns the reads to the reference genome to find SNPs in the reads, then finds maximum likelihood estimates for the strain genotypes and the strain frequencies.  It outputs Genome objects, one per Strain mode.  The inferred relative abundance of each Strain can be found in the <i>Summary</i> section of the Report.  The SNPs found are also given in the Report.</p>
 
+  <p><strong>Team members who deployed this App in KBase</strong>: <a href="https://narrative.kbase.us/#people/dylan">Dylan Chivian</a>. For questions, please <a href="http://www.kbase.us/support/">contact us</a>.</p>
 
 publications: 
     -
@@ -61,7 +62,12 @@ publications:
               https://bitbucket.org/yonatanf/strainfinder
     -
         display-text: |
-              meta_decoder Github Repo
+              Friedman, J. "Microbial adaptation, differentiation, and community structure." MIT DSpace 2013
+        link: |
+              https://dspace.mit.edu/handle/1721.1/81751
+    -
+        display-text: |
+              Meta Decoder Github Repo
         link: |
               https://github.com/kbaseapps/kb_meta_decoder
     -
@@ -71,6 +77,6 @@ publications:
               https://vcftools.github.io/
     -
         display-text: |
-              "The Variant Call Format and VCFtools" Petr Danecek, Adam Auton, Goncalo Abecasis, Cornelis A. Albers, Eric Banks, Mark A. DePristo, Robert Handsaker, Gerton Lunter, Gabor Marth, Stephen T. Sherry, Gilean McVean, Richard Durbin and 1000 Genomes Project Analysis Group, Bioinformatics, 2011 
+              Danecek, P., et al. "The Variant Call Format and VCFtools." Bioinformatics 2011;27(15) pages 2156–8.
         link: |
               http://dx.doi.org/10.1093/bioinformatics/btr330

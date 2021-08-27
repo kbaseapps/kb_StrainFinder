@@ -41,9 +41,9 @@ class kb_StrainFinder:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.1.0"
+    VERSION = "0.1.3"
     GIT_URL = "https://github.com/kbaseapps/kb_StrainFinder"
-    GIT_COMMIT_HASH = "7189d399ad37ad6a735dd3138e50be5c24c1609a"
+    GIT_COMMIT_HASH = "f722943727c6aa3e37317e1fa12f7be43a531e97"
 
     #BEGIN_CLASS_HEADER
 
