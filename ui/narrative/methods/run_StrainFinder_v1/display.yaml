@@ -6,7 +6,8 @@ name: Find Strain Genomes with StrainFinder v1
 tooltip: |
     Runs the StrainFinder v1 method to obtain haplotype modes
 
-screenshots: []
+screenshots:
+    - StrainFinder.png
 
 icon: strainfinder-green.png
 
@@ -50,7 +51,10 @@ parameters :
         short-hint : Output GenomeSet.
 
 description : |
-  <p>Strain Finder v1 takes as input a reference genome and a Reads Library.  It aligns the reads to the reference genome to find SNPs in the reads, then finds maximum likelihood estimates for the strain genotypes and the strain frequencies.  It outputs Genome objects, one per Strain mode.  The inferred relative abundance of each Strain can be found in the <i>Summary</i> section of the Report.  The SNPs found are also given in the Report.</p>
+  <p>Strain Finder v1 takes as input a reference genome and a Reads Library.  It aligns the reads to the reference genome to find SNPs in the reads, then finds maximum likelihood estimates for the strain genotypes and the corresponding strain frequencies based on the frequencies of each SNP.  StrainFinder v1 uses just the frequencies from a given library</p>
+  <p>StrainFinder v1 outputs Genome objects, one Genome per Strain mode.  A GenomeSet is also produced containing the Strain Genomes.  If multiple Reads Libraries are given, StrainFinder v1 makes a set of Genomes for each Reads Library independently.</p>
+  <p>The inferred relative abundance of each Strain can be found in the <i>Summary</i> section of the Report.  The SNPs found are also given in the HTML section of the Report.</p>
+  <p>The Binary Sequence Alignment Map (<a href=""https://samtools.github.io/hts-specs/SAMv1.pdf">BAM</a>) file and the Variant Call Format (<a href="https://samtools.github.io/hts-specs/VCFv4.2.pdf">VCF</a>) file can be downloaded in the "file links" section of the report.  The Genome sequences are available for download from the Genome object.</p>
 
   <p><strong>Team members who deployed this App in KBase</strong>: <a href="https://narrative.kbase.us/#people/dylan">Dylan Chivian</a>. For questions, please <a href="http://www.kbase.us/support/">contact us</a>.</p>
 

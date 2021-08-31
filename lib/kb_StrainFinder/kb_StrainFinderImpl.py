@@ -41,9 +41,9 @@ class kb_StrainFinder:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.1.3"
+    VERSION = "0.1.4"
     GIT_URL = "https://github.com/kbaseapps/kb_StrainFinder"
-    GIT_COMMIT_HASH = "f722943727c6aa3e37317e1fa12f7be43a531e97"
+    GIT_COMMIT_HASH = "dc761622114212ce15a511d3691f019352fcba92"
 
     #BEGIN_CLASS_HEADER
 
@@ -717,10 +717,11 @@ str(input_reads_ref) +')' + str(e))
             
         #### STEP 10: Create Assembly FASTAs for strain genomes
         ##
-        #num_genomes_found_per_readslib = []
         all_new_genome_refs = []
         all_new_genome_names = []
         all_set_elements = dict()
+        num_genomes_found_per_readslib = []
+        num_genomes_found_this_readslib = 0
         num_strain_genomes_generated = 0
         for reads_lib_i,reads_lib_ref in enumerate(expanded_reads_refs):
             self.log(console, "GETTING ALLELES FOR STRAIN MODES for ReadsLib "+str(reads_lib_i+1))
@@ -729,17 +730,17 @@ str(input_reads_ref) +')' + str(e))
             with open (fitted_genomes_file, 'r') as fitted_genomes_handle:
                 for row in fitted_genomes_handle.readlines():
                     fitted_genomes_rows.append(row.rstrip().split())
-            num_genomes_found = len(fitted_genomes_rows[0])
-            #num_genomes_found_per_readslib.append(num_genomes_found)
+            num_genomes_found_this_readslib = len(fitted_genomes_rows[0])
+            num_genomes_found_per_readslib.append(num_genomes_found_this_readslib)
             
             # only one strain mode (may not be same as reference so do generate strain genome
-            if num_genomes_found == 1:
+            if num_genomes_found_this_readslib == 1:
                 msg = "ReadsLib "+str(reads_lib_i)+": StrainFinder found only one strain in the data.  Not creating GenomeSet for Reads Library "+str(reads_lib_i+1)
                 self.log(console, msg)
                 report_text += msg+"\n"
 
             # multiple strain modes
-            num_strain_genomes_generated += num_genomes_found
+            num_strain_genomes_generated += num_genomes_found_this_readslib
                 
             # set provenance to just include this reads lib for input_ws_objects
             this_provenance = provenance
@@ -750,7 +751,7 @@ str(input_reads_ref) +')' + str(e))
             ####  Make revised Assembly Fasta
             ##
             new_fasta_files = []
-            for genome_i in range(num_genomes_found):
+            for genome_i in range(num_genomes_found_per_readslib[reads_lib_i]):
                 new_genome_fasta = dict()
                 new_genome_headers = dict()
                 new_genome_fasta_len = dict()
@@ -813,7 +814,7 @@ str(input_reads_ref) +')' + str(e))
 
             # build strain genomes
             new_gff_files = []
-            for genome_i in range(num_genomes_found):
+            for genome_i in range(num_genomes_found_per_readslib[reads_lib_i]):
                 new_gff_buf = []
                 with open (input_genome_gff_file, 'r') as gff_handle:
                     for gff_line in gff_handle.readlines():
@@ -893,7 +894,7 @@ str(input_reads_ref) +')' + str(e))
             set_elements = dict()
             #items = []
 
-            for genome_i in range(num_genomes_found):
+            for genome_i in range(num_genomes_found_per_readslib[reads_lib_i]):
                 new_genome_obj_name = re.sub(r'\.[^\.]+$','',params['out_genomeSet_obj_name'])
                 new_genome_obj_name += '-Reads_'+str(reads_lib_i+1)+'-Strain_'+str(genome_i+1)
                 new_genome_obj_name += ".Genome"
@@ -920,7 +921,7 @@ str(input_reads_ref) +')' + str(e))
                 all_set_elements[new_genome_obj_name]['ref'] = new_genome_ref
 
             # attach created Genome objs to report
-            for genome_i in range(num_genomes_found):
+            for genome_i in range(num_genomes_found_per_readslib[reads_lib_i]):
                 objects_created.append({'ref': new_genome_refs[genome_i],
                                         'description': new_genome_names[genome_i]+' StrainFinder Genome'})
 
@@ -930,7 +931,7 @@ str(input_reads_ref) +')' + str(e))
             # HERE
                     
             # create GenomeSet for this ReadsLib
-            if num_genomes_found > 1 and len(expanded_reads_refs) > 1:
+            if num_genomes_found_per_readslib[reads_lib_i] > 1 and len(expanded_reads_refs) > 1:
                 genomeSet_name = params['out_genomeSet_obj_name']+'-Reads_'+str(reads_lib_i+1)
                 genomeSet_obj = { 'description': 'Strain Genomes of '+input_genome_obj_name+' from ReadsLib '+str(reads_lib_i+1),
                                   #'items': items
@@ -962,8 +963,10 @@ str(input_reads_ref) +')' + str(e))
             #### STEP 13: Add haplotype impact on genotype to Report?  Just minimally for now
             ##
             self.log(console, "ANALYZING GENOTYPES")
-            for genome_i in range(num_genomes_found):
-                report_text += 'GENOME '+str(genome_i+1)+': '+str(100*(float(abund_vec[genome_i])))+' %'+"\n"
+            for genome_i in range(num_genomes_found_per_readslib[reads_lib_i]):
+                msg = 'READS LIB '+str(reads_lib_i+1)+' GENOME '+str(genome_i+1)+' RELATIVE ABUNDANCE: '+str(100*(float(abund_vecs[reads_lib_i][genome_i])))+' %'+"\n"
+                self.log(console, msg)
+                report_text += msg
                 
                     
         #### STEP 14: create GenomeSet for all generated Strains
