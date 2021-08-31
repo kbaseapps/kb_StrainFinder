@@ -1,6 +1,11 @@
 # kb_StrainFinder release notes
 =========================================
 
+0.1.4
+-----
+* fixed bug with abundance over multiple reads libs
+* improved App Docs
+
 0.1.3
 -----
 * updated publications in display.yaml to follow PLoS format
