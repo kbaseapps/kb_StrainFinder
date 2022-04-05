@@ -1,6 +1,10 @@
 # kb_StrainFinder release notes
 =========================================
 
+1.0.0
+-----
+* pass max_depth to call_snps()
+
 0.1.4
 -----
 * fixed bug with abundance over multiple reads libs

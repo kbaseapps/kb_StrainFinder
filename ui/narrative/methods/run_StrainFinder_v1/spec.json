@@ -56,7 +56,18 @@
             "optional": false,
             "advanced": true,
             "allow_multiple": false,
-            "default_values": [ "50" ],
+            "default_values": [ "3" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_as": "int"
+	    }
+        },
+        {
+            "id": "max_depth",
+            "optional": false,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "10000" ],
             "field_type": "text",
             "text_options": {
                 "validate_as": "int"
@@ -109,6 +120,11 @@
                 {
                     "input_parameter": "min_depth",
                     "target_property": "min_depth",
+		    "target_argument_position": 0
+                },
+                {
+                    "input_parameter": "max_depth",
+                    "target_property": "max_depth",
 		    "target_argument_position": 0
                 },
                 {

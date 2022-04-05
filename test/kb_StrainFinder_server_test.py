@@ -186,7 +186,8 @@ class kb_StrainFinderTest(unittest.TestCase):
             'in_readslib_refs': [self.reads_refs[0]],
             'out_genomeSet_obj_name': output_name,
             'min_mapping_quality': 30,
-            'min_depth': 50
+            'min_depth': 3,
+            'max_depth': 10000
         }
         result = self.getImpl().run_StrainFinder_v1(self.getContext(),params)
 
@@ -215,7 +216,8 @@ class kb_StrainFinderTest(unittest.TestCase):
             'in_readslib_refs': [self.reads_refs[0], self.reads_refs[1]],
             'out_genomeSet_obj_name': output_name,
             'min_mapping_quality': 30,
-            'min_depth': 50
+            'min_depth': 3,
+            'max_depth': 10000
         }
         result = self.getImpl().run_StrainFinder_v1(self.getContext(),params)
 
@@ -275,7 +277,8 @@ class kb_StrainFinderTest(unittest.TestCase):
             'in_readslib_refs': [reads_set_ref],
             'out_genomeSet_obj_name': output_name,
             'min_mapping_quality': 30,
-            'min_depth': 50
+            'min_depth': 3,
+            'max_depth': 10000
         }
         result = self.getImpl().run_StrainFinder_v1(self.getContext(),params)
 
