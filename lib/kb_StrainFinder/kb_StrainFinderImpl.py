@@ -43,7 +43,7 @@ class kb_StrainFinder:
     ######################################### noqa
     VERSION = "1.0.0"
     GIT_URL = "https://github.com/kbaseapps/kb_StrainFinder"
-    GIT_COMMIT_HASH = "28bfa7b15a69b0b6b569a5a9d792aa6905a30b36"
+    GIT_COMMIT_HASH = "9dcddd8a8bd37e85d553e402a3301af0a49fbbf6"
 
     #BEGIN_CLASS_HEADER
 

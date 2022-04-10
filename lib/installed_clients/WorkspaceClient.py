@@ -1524,65 +1524,69 @@ class Workspace(object):
            accessed; return null for that object's information instead.
            Default false. boolean no_data - return the provenance,
            references, and object_info for this object without the object
-           data. Default false.) -> structure: parameter "objects" of list of
-           type "ObjectSpecification" (An Object Specification (OS). Inherits
-           from ObjectIdentity (OI). Specifies which object, and which parts
-           of that object, to retrieve from the Workspace Service. The fields
-           wsid, workspace, objid, name, and ver are identical to the OI
-           fields. The ref field's behavior is extended from OI. It maintains
-           its previous behavior, but now also can act as a reference string.
-           See reference following below for more information. REFERENCE
-           FOLLOWING: Reference following guarantees that a user that has
-           access to an object can always see a) objects that are referenced
-           inside the object and b) objects that are referenced in the
-           object's provenance. This ensures that the user has visibility
-           into the entire provenance of the object and the object's object
-           dependencies (e.g. references). The user must have at least read
-           access to the object specified in this SO, but need not have
-           access to any further objects in the reference chain, and those
-           objects may be deleted. Optional reference following fields: Note
-           that only one of the following fields may be specified. ref_chain
-           obj_path - a path to the desired object from the object specified
-           in this OS. In other words, the object specified in this OS is
-           assumed to be accessible to the user, and the objects in the
-           object path represent a chain of references to the desired object
-           at the end of the object path. If the references are all valid,
-           the desired object will be returned. - OR - list<obj_ref>
-           obj_ref_path - shorthand for the obj_path. - OR - ref_chain
-           to_obj_path - identical to obj_path, except that the path is TO
-           the object specified in this OS, rather than from the object. In
-           other words the object specified by wsid/objid/ref etc. is the end
-           of the path, and to_obj_path is the rest of the path. The user
-           must have access to the first object in the to_obj_path. - OR -
-           list<obj_ref> to_obj_ref_path - shorthand for the to_obj_path. -
-           OR - ref_string ref - A string representing a reference path from
-           one object to another. Unlike the previous reference following
-           options, the ref_string represents the ENTIRE path from the source
-           object to the target object. As with the OI object, the ref field
-           may contain a single reference. - OR - boolean find_refence_path -
-           This is the last, slowest, and most expensive resort for getting a
-           referenced object - do not use this method unless the path to the
-           object is unavailable by any other means. Setting the
-           find_refence_path parameter to true means that the workspace
-           service will search through the object reference graph from the
-           object specified in this OS to find an object that 1) the user can
-           access, and 2) has an unbroken reference path to the target
-           object. If the search succeeds, the object will be returned as
-           normal. Note that the search will automatically fail after a
-           certain (but much larger than necessary for the vast majority of
-           cases) number of objects are traversed. OBJECT SUBSETS: When
-           selecting a subset of an array in an object, the returned array is
-           compressed to the size of the subset, but the ordering of the
-           array is maintained. For example, if the array stored at the
-           'feature' key of a Genome object has 4000 entries, and the object
-           paths provided are: /feature/7 /feature/3015 /feature/700 The
-           returned feature array will be of length three and the entries
-           will consist, in order, of the 7th, 700th, and 3015th entries of
-           the original array. Optional object subset fields:
-           list<object_path> included - the portions of the object to include
-           in the object subset. boolean strict_maps - if true, throw an
-           exception if the subset specification traverses a non-existent map
-           key (default false) boolean strict_arrays - if true, throw an
+           data. Default false. boolean skip_external_system_updates - if the
+           object contains any external IDs, don't contact external systems
+           to perform any updates for those IDs (often ACL updates, e.g. for
+           handle / blobstore / sample IDs). In some cases this can speed up
+           fetching the data. Default false.) -> structure: parameter
+           "objects" of list of type "ObjectSpecification" (An Object
+           Specification (OS). Inherits from ObjectIdentity (OI). Specifies
+           which object, and which parts of that object, to retrieve from the
+           Workspace Service. The fields wsid, workspace, objid, name, and
+           ver are identical to the OI fields. The ref field's behavior is
+           extended from OI. It maintains its previous behavior, but now also
+           can act as a reference string. See reference following below for
+           more information. REFERENCE FOLLOWING: Reference following
+           guarantees that a user that has access to an object can always see
+           a) objects that are referenced inside the object and b) objects
+           that are referenced in the object's provenance. This ensures that
+           the user has visibility into the entire provenance of the object
+           and the object's object dependencies (e.g. references). The user
+           must have at least read access to the object specified in this SO,
+           but need not have access to any further objects in the reference
+           chain, and those objects may be deleted. Optional reference
+           following fields: Note that only one of the following fields may
+           be specified. ref_chain obj_path - a path to the desired object
+           from the object specified in this OS. In other words, the object
+           specified in this OS is assumed to be accessible to the user, and
+           the objects in the object path represent a chain of references to
+           the desired object at the end of the object path. If the
+           references are all valid, the desired object will be returned. -
+           OR - list<obj_ref> obj_ref_path - shorthand for the obj_path. - OR
+           - ref_chain to_obj_path - identical to obj_path, except that the
+           path is TO the object specified in this OS, rather than from the
+           object. In other words the object specified by wsid/objid/ref etc.
+           is the end of the path, and to_obj_path is the rest of the path.
+           The user must have access to the first object in the to_obj_path.
+           - OR - list<obj_ref> to_obj_ref_path - shorthand for the
+           to_obj_path. - OR - ref_string ref - A string representing a
+           reference path from one object to another. Unlike the previous
+           reference following options, the ref_string represents the ENTIRE
+           path from the source object to the target object. As with the OI
+           object, the ref field may contain a single reference. - OR -
+           boolean find_refence_path - This is the last, slowest, and most
+           expensive resort for getting a referenced object - do not use this
+           method unless the path to the object is unavailable by any other
+           means. Setting the find_refence_path parameter to true means that
+           the workspace service will search through the object reference
+           graph from the object specified in this OS to find an object that
+           1) the user can access, and 2) has an unbroken reference path to
+           the target object. If the search succeeds, the object will be
+           returned as normal. Note that the search will automatically fail
+           after a certain (but much larger than necessary for the vast
+           majority of cases) number of objects are traversed. OBJECT
+           SUBSETS: When selecting a subset of an array in an object, the
+           returned array is compressed to the size of the subset, but the
+           ordering of the array is maintained. For example, if the array
+           stored at the 'feature' key of a Genome object has 4000 entries,
+           and the object paths provided are: /feature/7 /feature/3015
+           /feature/700 The returned feature array will be of length three
+           and the entries will consist, in order, of the 7th, 700th, and
+           3015th entries of the original array. Optional object subset
+           fields: list<object_path> included - the portions of the object to
+           include in the object subset. boolean strict_maps - if true, throw
+           an exception if the subset specification traverses a non-existent
+           map key (default false) boolean strict_arrays - if true, throw an
            exception if the subset specification exceeds the size of an array
            (default true)) -> structure: parameter "workspace" of type
            "ws_name" (A string used as a name for a workspace. Any string
@@ -1710,7 +1714,9 @@ class Workspace(object):
            "strict_arrays" of type "boolean" (A boolean. 0 = false, other =
            true.), parameter "ignoreErrors" of type "boolean" (A boolean. 0 =
            false, other = true.), parameter "no_data" of type "boolean" (A
-           boolean. 0 = false, other = true.)
+           boolean. 0 = false, other = true.), parameter
+           "skip_external_system_updates" of type "boolean" (A boolean. 0 =
+           false, other = true.)
         :returns: instance of type "GetObjects2Results" (Results from the
            get_objects2 function. list<ObjectData> data - the returned
            objects.) -> structure: parameter "data" of list of type
@@ -3038,40 +3044,52 @@ class Workspace(object):
         """
         List objects in one or more workspaces.
         :param params: instance of type "ListObjectsParams" (Parameters for
-           the 'list_objects' function. At least one of the following filters
-           must be provided. It is strongly recommended that the list is
-           restricted to the workspaces of interest, or the results may be
-           very large: list<ws_id> ids - the numerical IDs of the workspaces
-           of interest. list<ws_name> workspaces - the names of the
-           workspaces of interest. type_string type - type of the objects to
-           be listed.  Here, omitting version information will find any
-           objects that match the provided type - e.g. Foo.Bar-0 will match
-           Foo.Bar-0.X where X is any existing version. Only one of each
-           timestamp/epoch pair may be supplied. Optional arguments:
-           permission perm - filter objects by minimum permission level.
-           'None' and 'readable' are ignored. list<username> savedby - filter
-           objects by the user that saved or copied the object. usermeta meta
-           - filter objects by the user supplied metadata. NOTE: only one
-           key/value pair is supported at this time. A full map is provided
-           as input for the possibility for expansion in the future.
-           timestamp after - only return objects that were created after this
-           date. timestamp before - only return objects that were created
-           before this date. epoch after_epoch - only return objects that
-           were created after this date. epoch before_epoch - only return
-           objects that were created before this date. obj_id minObjectID -
-           only return objects with an object id greater or equal to this
-           value. obj_id maxObjectID - only return objects with an object id
-           less than or equal to this value. boolean showDeleted - show
-           deleted objects in workspaces to which the user has write access.
-           boolean showOnlyDeleted - only show deleted objects in workspaces
-           to which the user has write access. boolean showHidden - show
-           hidden objects. boolean showAllVersions - show all versions of
-           each object that match the filters rather than only the most
-           recent version. boolean includeMetadata - include the user
-           provided metadata in the returned object_info. If false (0 or
-           null), the default, the metadata will be null. boolean
-           excludeGlobal - exclude objects in global workspaces. This
-           parameter only has an effect when filtering by types alone. int
+           the 'list_objects' function. At least one, and no more than 10000,
+           workspaces must be specified in one of the two following
+           parameters. It is strongly recommended that the list is restricted
+           to the workspaces of interest, or the results may be very large:
+           list<ws_id> ids - the numerical IDs of the workspaces of interest.
+           list<ws_name> workspaces - the names of the workspaces of
+           interest. Only one of each timestamp/epoch pair may be supplied.
+           Optional arguments: type_string type - type of the objects to be
+           listed.  Here, omitting version information will find any objects
+           that match the provided type - e.g. Foo.Bar-0 will match
+           Foo.Bar-0.X where X is any existing version. permission perm -
+           DEPRECATED, no longer useful. Filter on minimum permission by
+           providing only workspaces with the desired permission levels in
+           the input list(s). list<username> savedby - filter objects by the
+           user that saved or copied the object. usermeta meta - filter
+           objects by the user supplied metadata. NOTE: only one key/value
+           pair is supported at this time. A full map is provided as input
+           for the possibility for expansion in the future. timestamp after -
+           only return objects that were created after this date. timestamp
+           before - only return objects that were created before this date.
+           epoch after_epoch - only return objects that were created after
+           this date. epoch before_epoch - only return objects that were
+           created before this date. string startafter - a reference-like
+           string that determines where the list of objects will begin. It
+           takes the form X/Y/Z, where X is the workspace ID, Y the object
+           ID, and Z the version. The version may be omitted, and the object
+           ID omitted if the version is also omitted. After a '/' separator
+           either an integer or no characters at all, including whitespace,
+           may occur. Whitespace strings are ignored. If startafter is
+           provided, after, before, after_epoch, before_epoch, savedby, meta,
+           minObjectID, and maxObjectID may not be provided. Only objects
+           that are ordered after the reference, exclusive, will be included
+           in the result, and the resulting list will be sorted by reference.
+           obj_id minObjectID - only return objects with an object id greater
+           or equal to this value. obj_id maxObjectID - only return objects
+           with an object id less than or equal to this value. boolean
+           showDeleted - show deleted objects in workspaces to which the user
+           has write access. boolean showOnlyDeleted - only show deleted
+           objects in workspaces to which the user has write access. boolean
+           showHidden - show hidden objects. boolean showAllVersions - show
+           all versions of each object that match the filters rather than
+           only the most recent version. boolean includeMetadata - include
+           the user provided metadata in the returned object_info. If false
+           (0 or null), the default, the metadata will be null. boolean
+           excludeGlobal - DEPRECATED, no longer useful. Filter on global
+           workspaces by excluding them from the input workspace list(s). int
            limit - limit the output to X objects. Default and maximum value
            is 10000. Limit values < 1 are treated as 10000, the default.) ->
            structure: parameter "workspaces" of list of type "ws_name" (A
@@ -3113,18 +3131,19 @@ class Workspace(object):
            time)), parameter "after_epoch" of type "epoch" (A Unix epoch (the
            time since 00:00:00 1/1/1970 UTC) in milliseconds.), parameter
            "before_epoch" of type "epoch" (A Unix epoch (the time since
-           00:00:00 1/1/1970 UTC) in milliseconds.), parameter "minObjectID"
-           of type "obj_id" (The unique, permanent numerical ID of an
-           object.), parameter "maxObjectID" of type "obj_id" (The unique,
-           permanent numerical ID of an object.), parameter "showDeleted" of
-           type "boolean" (A boolean. 0 = false, other = true.), parameter
-           "showOnlyDeleted" of type "boolean" (A boolean. 0 = false, other =
-           true.), parameter "showHidden" of type "boolean" (A boolean. 0 =
-           false, other = true.), parameter "showAllVersions" of type
+           00:00:00 1/1/1970 UTC) in milliseconds.), parameter "startafter"
+           of String, parameter "minObjectID" of type "obj_id" (The unique,
+           permanent numerical ID of an object.), parameter "maxObjectID" of
+           type "obj_id" (The unique, permanent numerical ID of an object.),
+           parameter "showDeleted" of type "boolean" (A boolean. 0 = false,
+           other = true.), parameter "showOnlyDeleted" of type "boolean" (A
+           boolean. 0 = false, other = true.), parameter "showHidden" of type
            "boolean" (A boolean. 0 = false, other = true.), parameter
-           "includeMetadata" of type "boolean" (A boolean. 0 = false, other =
-           true.), parameter "excludeGlobal" of type "boolean" (A boolean. 0
-           = false, other = true.), parameter "limit" of Long
+           "showAllVersions" of type "boolean" (A boolean. 0 = false, other =
+           true.), parameter "includeMetadata" of type "boolean" (A boolean.
+           0 = false, other = true.), parameter "excludeGlobal" of type
+           "boolean" (A boolean. 0 = false, other = true.), parameter "limit"
+           of Long
         :returns: instance of list of type "object_info" (Information about
            an object, including user provided metadata. obj_id objid - the
            numerical id of the object. obj_name name - the name of the

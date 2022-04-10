@@ -4,6 +4,7 @@
 1.0.0
 -----
 * pass max_depth to call_snps()
+* require openopt==0.5629
 
 0.1.4
 -----
