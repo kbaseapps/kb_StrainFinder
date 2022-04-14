@@ -61,6 +61,8 @@ description : |
   <p>The inferred relative abundance of each Strain can be found in the <i>Summary</i> section of the Report.  The SNPs found are also given in the HTML section of the Report.</p>
   <p>The Binary Sequence Alignment Map (<a href=""https://samtools.github.io/hts-specs/SAMv1.pdf">BAM</a>) file and the Variant Call Format (<a href="https://samtools.github.io/hts-specs/VCFv4.2.pdf">VCF</a>) file can be downloaded in the "file links" section of the report.  The Genome sequences are available for download from the Genome object.</p>
 
+  <p>StrainFinder v1 is from 2013-11-18</p>
+
   <p><strong>Team members who deployed this App in KBase</strong>: <a href="https://narrative.kbase.us/#people/dylan">Dylan Chivian</a> and <a href="https://narrative.kbase.us/#people/jmc">John-Marc Chandonia</a>. For questions, please <a href="http://www.kbase.us/support/">contact us</a>.</p>
 
 publications: 
