@@ -48,19 +48,20 @@ parameters :
 
     max_depth :
         ui-name    : Maximum depth
-        short-hint : Maximum coverage depth for calling variants (to avoid excessive calculations)
+        short-hint : Maximum coverage depth for calling variants (to avoid incorrect calculations from repeats)
 
     out_genomeSet_obj_name :
         ui-name    : Output GenomeSet
         short-hint : Output GenomeSet.
 
 description : |
-  <p>Strain Finder v1 takes as input a reference genome and a Reads Library.  It aligns the reads to the reference genome to find SNPs in the reads, then finds maximum likelihood estimates for the strain genotypes and the corresponding strain frequencies based on the frequencies of each SNP.  StrainFinder v1 uses just the frequencies from a given library</p>
+  <p>Strain Finder v1 takes as input a reference genome and a Reads Library.  It aligns the reads to the reference genome to find SNPs in the reads, then finds maximum likelihood estimates for the strain genotypes and the corresponding strain frequencies based on the frequencies of each SNP.  StrainFinder v1 uses just the frequencies from a single library at a time, which are treated independently.</p>
+  <p>Options to set the minimum sequence depth and maximum sequence depth from which to consider SNPs are provided.  Positions with low read alignment depth are expected to provide inferior sampling of the strains, or if the reference genome is a MAG, may represent incorrectly assembled regions of the genome.  The default value of 3 provided should be reset to a value of about 1/2 of the mean of the read depth for lineages with sufficient abundance in the sample to obtain higher average depth of coverage.  The maximum sequence depth is also provided to avoid determining SNPs in regions that represent repeats, such as transposons, or other paralogous regions (e.g., see Fig 5 of https://academic.oup.com/bioinformatics/article/30/20/2843/2422145).  Therefore, the maximum read depth should be set to a bit below 2x the average depth of coverage.</p>
   <p>StrainFinder v1 outputs Genome objects, one Genome per Strain mode.  A GenomeSet is also produced containing the Strain Genomes.  If multiple Reads Libraries are given, StrainFinder v1 makes a set of Genomes for each Reads Library independently.</p>
   <p>The inferred relative abundance of each Strain can be found in the <i>Summary</i> section of the Report.  The SNPs found are also given in the HTML section of the Report.</p>
   <p>The Binary Sequence Alignment Map (<a href=""https://samtools.github.io/hts-specs/SAMv1.pdf">BAM</a>) file and the Variant Call Format (<a href="https://samtools.github.io/hts-specs/VCFv4.2.pdf">VCF</a>) file can be downloaded in the "file links" section of the report.  The Genome sequences are available for download from the Genome object.</p>
 
-  <p><strong>Team members who deployed this App in KBase</strong>: <a href="https://narrative.kbase.us/#people/dylan">Dylan Chivian</a>. For questions, please <a href="http://www.kbase.us/support/">contact us</a>.</p>
+  <p><strong>Team members who deployed this App in KBase</strong>: <a href="https://narrative.kbase.us/#people/dylan">Dylan Chivian</a> and <a href="https://narrative.kbase.us/#people/jmc">John-Marc Chandonia</a>. For questions, please <a href="http://www.kbase.us/support/">contact us</a>.</p>
 
 publications: 
     -
