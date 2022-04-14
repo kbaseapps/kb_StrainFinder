@@ -1,6 +1,12 @@
 # kb_StrainFinder release notes
 =========================================
 
+1.0.0
+-----
+* pass max_depth to call_snps()
+* manually install openopt, FuncDesigner, and DerApproximator because not in PyPI index
+* force path to urllib3 v1.22 because v1.7.1 accidentally overriding
+
 0.1.4
 -----
 * fixed bug with abundance over multiple reads libs

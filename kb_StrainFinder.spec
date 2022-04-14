@@ -17,6 +17,7 @@ module kb_StrainFinder {
 
 	int min_mapping_quality;
 	int min_depth;
+	int max_depth;
     } StrainFinder_v1_InputType;
 
     /*
