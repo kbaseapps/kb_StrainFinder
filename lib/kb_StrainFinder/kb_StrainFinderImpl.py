@@ -41,9 +41,9 @@ class kb_StrainFinder:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.1.4"
+    VERSION = "1.0.0"
     GIT_URL = "https://github.com/kbaseapps/kb_StrainFinder"
-    GIT_COMMIT_HASH = "dc761622114212ce15a511d3691f019352fcba92"
+    GIT_COMMIT_HASH = "9dcddd8a8bd37e85d553e402a3301af0a49fbbf6"
 
     #BEGIN_CLASS_HEADER
 
@@ -203,7 +203,8 @@ class kb_StrainFinder:
            structure: parameter "workspace_name" of String, parameter
            "in_genome_ref" of String, parameter "in_readslib_refs" of list of
            String, parameter "out_genomeSet_obj_name" of String, parameter
-           "min_mapping_quality" of Long, parameter "min_depth" of Long
+           "min_mapping_quality" of Long, parameter "min_depth" of Long,
+           parameter "max_depth" of Long
         :returns: instance of type "ReportResults" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String
         """
@@ -268,6 +269,7 @@ class kb_StrainFinder:
                            'in_readslib_refs',
                            'min_mapping_quality',
                            'min_depth',
+                           'max_depth',
                            'out_genomeSet_obj_name'
                            ]
         for required_param in required_params:
@@ -434,6 +436,7 @@ str(input_reads_ref) +')' + str(e))
             'reads_refs': expanded_reads_refs,
             'min_mapping_quality': params['min_mapping_quality'],
             'min_depth': params['min_depth'],
+            'max_depth': params['max_depth'],
             'output_vcf': params['out_genomeSet_obj_name']+'.VCF'  # may need to make separate names
         }
         #MD_SERVICE_VER = 'release'
